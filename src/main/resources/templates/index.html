@@ -1,0 +1,305 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <title>Inicio | Energía Inteligente</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body, html {
+            height: 100%;
+            overflow-x: hidden;
+            font-family: 'Segoe UI', sans-serif;
+        }
+
+        header {
+            position: absolute;
+            top: 0;
+            width: 100%;
+            z-index: 10;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 15px 30px;
+            background-color: rgba(255, 255, 255, 0.9);
+        }
+
+        header img {
+            height: 50px;
+        }
+
+        .buttons-container {
+            display: flex;
+            gap: 10px;
+        }
+
+        .role-btn {
+            background-color: #a6e59e;
+            color: #2d2d2d;
+            border: none;
+            padding: 10px 18px;
+            border-radius: 25px;
+            font-weight: bold;
+            cursor: pointer;
+        }
+
+        .slider {
+            position: relative;
+            height: 100vh;
+            width: 100vw;
+            overflow: hidden;
+        }
+
+        .slides {
+            display: flex;
+            width: 300vw;
+            transition: transform 0.8s ease-in-out;
+        }
+
+        .slide {
+            width: 100vw;
+            height: 100vh;
+            position: relative;
+            flex-shrink: 0;
+        }
+
+        .slide img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+        }
+
+        .text-overlay {
+            position: absolute;
+            top: 50%;
+            left: 10%;
+            transform: translateY(-50%);
+            color: white;
+            background: rgba(0, 0, 0, 0.4);
+            padding: 20px;
+            border-radius: 10px;
+            max-width: 400px;
+        }
+
+        .text-overlay h3 {
+            margin-bottom: 10px;
+            font-size: 2em;
+        }
+
+        .text-overlay p {
+            font-size: 1.2em;
+        }
+
+        .controls {
+            position: absolute;
+            bottom: 20px;
+            width: 100%;
+            display: flex;
+            justify-content: center;
+            z-index: 5;
+        }
+
+        .dot {
+            height: 15px;
+            width: 15px;
+            margin: 0 5px;
+            background-color: #ccc;
+            border-radius: 50%;
+            display: inline-block;
+            cursor: pointer;
+        }
+
+        .dot.active {
+            background-color: #333;
+        }
+
+        form {
+            display: inline;
+        }
+
+        section.pago, section.incidente {
+            padding: 40px;
+            background: #f2f2f2;
+            text-align: center;
+        }
+
+        section.pago h2, section.incidente h2 {
+            margin-bottom: 15px;
+            color: #2d2d2d;
+        }
+
+        section.pago input, section.incidente input, section.incidente textarea {
+            width: 80%;
+            max-width: 400px;
+            padding: 10px;
+            margin: 10px auto;
+            display: block;
+            border-radius: 5px;
+            border: 1px solid #ccc;
+        }
+
+        section.pago button, section.incidente button {
+            padding: 10px 20px;
+            background-color: #a6e59e;
+            border: none;
+            border-radius: 25px;
+            font-weight: bold;
+            cursor: pointer;
+            margin-top: 10px;
+        }
+
+        .incidente .note {
+            margin-top: 15px;
+            font-size: 0.9em;
+            color: #555;
+        }
+
+        footer {
+            background-color: #2d2d2d;
+            color: white;
+            padding: 30px;
+            display: flex;
+            justify-content: space-around;
+            flex-wrap: wrap;
+        }
+
+        .footer-section {
+            margin-bottom: 20px;
+            max-width: 300px;
+        }
+
+        .footer-section h4 {
+            margin-bottom: 10px;
+            color: #a6e59e;
+        }
+
+        .footer-section p, .footer-section a {
+            color: #ddd;
+            font-size: 0.9em;
+        }
+
+        .social-icons a {
+            margin-right: 10px;
+            font-size: 1.5em;
+            text-decoration: none;
+        }
+    </style>
+</head>
+<body>
+
+<header>
+    <img src="/img/logo.png" alt="Energía Inteligente">
+    <div class="buttons-container">
+        <form action="/guardar-rol" method="post">
+            <input type="hidden" name="rol" value="cliente" />
+            <button type="submit" class="role-btn">Ingreso Clientes</button>
+        </form>
+        <form action="/guardar-rol" method="post">
+            <input type="hidden" name="rol" value="empleado" />
+            <button type="submit" class="role-btn">Ingreso Operadores</button>
+        </form>
+    </div>
+</header>
+
+<div class="slider">
+    <div class="slides" id="slides">
+        <div class="slide">
+            <img src="/img/consumo.png" alt="Consumo">
+            <div class="text-overlay">
+                <h3>Consulte su Consumo</h3>
+                <p>Revise su historial de consumo y optimice su uso de energía.</p>
+            </div>
+        </div>
+        <div class="slide">
+            <img src="/img/pagos.png" alt="Pagos">
+            <div class="text-overlay">
+                <h3>Pago de Facturas</h3>
+                <p>Pague en línea sus cuentas de forma rápida y segura.</p>
+            </div>
+        </div>
+        <div class="slide">
+            <img src="/img/incidencias.png" alt="Incidencias">
+            <div class="text-overlay">
+                <h3>Reporte de Incidencias</h3>
+                <p>Notifique fallas en el servicio y reciba atención oportuna.</p>
+            </div>
+        </div>
+    </div>
+
+    <div class="controls">
+        <span class="dot active" onclick="goToSlide(0)"></span>
+        <span class="dot" onclick="goToSlide(1)"></span>
+        <span class="dot" onclick="goToSlide(2)"></span>
+    </div>
+</div>
+
+<!-- BOTÓN DE PAGO -->
+<section class="pago">
+    <h2>Botón de Pago</h2>
+    <p>Para iniciar el proceso de pago por favor digite su número de cuenta, que se encuentra en la parte superior derecha de su factura.</p>
+    <input type="text" placeholder="Ej: CUN523864" />
+    <button>PAGAR</button>
+</section>
+
+<!-- REPORTE DE INCIDENTES -->
+<section class="incidente">
+    <h2>REPORTE SU INCIDENTE</h2>
+    <form>
+        <div class="form-grid">
+            <input type="text" placeholder="Nombre" required name="nombre" />
+            <input type="text" placeholder="Cuenta asociada" required name="cuenta" />
+            <input type="email" placeholder="Correo electrónico" required name="correo" />
+            <textarea placeholder="Descripción" required name="descripcion"></textarea>
+        </div>
+        <button type="submit">ENVIAR</button>
+        <div class="note">Recuerde que el reporte detallado lo puede realizar iniciando sesión.</div>
+    </form>
+</section>
+
+<!-- FOOTER -->
+<footer>
+    <div class="footer-section">
+        <h4>Síganos en redes</h4>
+        <div class="social-icons">
+            <a href="#"><span>📘</span></a>
+            <a href="#"><span>📸</span></a>
+            <a href="#"><span>🐦</span></a>
+        </div>
+    </div>
+    <div class="footer-section">
+        <h4>CONTACTO</h4>
+        <p>Dirección: Cra. 5 # 21-38, Santa Fé, Bogotá, Cundinamarca</p>
+        <p>Correo: contacto@energiainteligente.com</p>
+        <p>Horario de atención: Lunes a viernes de 8:30am a 5:00pm</p>
+    </div>
+</footer>
+
+<script>
+    let currentIndex = 0;
+    const slides = document.getElementById('slides');
+    const dots = document.querySelectorAll('.dot');
+
+    function goToSlide(index) {
+        currentIndex = index;
+        slides.style.transform = `translateX(-${index * 100}vw)`;
+        updateDots();
+    }
+
+    function updateDots() {
+        dots.forEach(dot => dot.classList.remove('active'));
+        dots[currentIndex].classList.add('active');
+    }
+
+    setInterval(() => {
+        currentIndex = (currentIndex + 1) % 3;
+        goToSlide(currentIndex);
+    }, 6000);
+</script>
+
+</body>
+</html>
