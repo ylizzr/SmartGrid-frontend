@@ -4,6 +4,10 @@
     <meta charset="UTF-8">
     <title>Inicio | Energía Inteligente</title>
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+    <!-- Bootstrap CSS -->
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+
     <style>
         * {
             margin: 0;
@@ -121,8 +125,13 @@
         form {
             display: inline;
         }
+        section.pago {
+        background-color: #f88641;
+        padding: 40px 20px;
+        text-align: center;
+        }
 
-        section.pago, section.incidente {
+        section.incidente {
             padding: 40px;
             background: #f2f2f2;
             text-align: center;
@@ -145,7 +154,8 @@
 
         section.pago button, section.incidente button {
             padding: 10px 20px;
-            background-color: #a6e59e;
+            background-color: #065B4E;
+            color: #FFFFFF;
             border: none;
             border-radius: 25px;
             font-weight: bold;
@@ -175,7 +185,8 @@
 
         .footer-section h4 {
             margin-bottom: 10px;
-            color: #a6e59e;
+            color: #065B4E;
+            color: #FFFFFF;
         }
 
         .footer-section p, .footer-section a {
@@ -194,33 +205,69 @@
 
 <header>
     <img src="/img/logo.png" alt="Energía Inteligente">
-    <div class="buttons-container">
-        <form action="/guardar-rol" method="post">
-            <input type="hidden" name="rol" value="cliente" />
-            <button type="submit" class="role-btn">Ingreso Clientes</button>
-        </form>
-        <form action="/guardar-rol" method="post">
-            <input type="hidden" name="rol" value="empleado" />
-            <button type="submit" class="role-btn">Ingreso Operadores</button>
-        </form>
-    </div>
-</header>
+        <div class="buttons-container">
+            <!-- Botón CLIENTES -->
+            <button type="button" class="role-btn" data-bs-toggle="modal" data-bs-target="#modalCliente">
+                CLIENTES
+            </button>
 
+            <!-- Botón OPERADORES -->
+            <button type="button" class="role-btn" data-bs-toggle="modal" data-bs-target="#modalOperador">
+                OPERADORES
+            </button>
+        </div>
+    </header>
+
+    <!-- Modal para CLIENTES -->
+    <div class="modal fade" id="modalCliente" tabindex="-1" aria-labelledby="modalClienteLabel" aria-hidden="true">
+        <div class="modal-dialog">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title" id="modalClienteLabel">Iniciar sesión como Cliente</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Cerrar"></button>
+                </div>
+                <div class="modal-body text-center">
+                    <h2>INICIO SESIÓN</h2>
+                    <a href="/oauth2/authorization/google">
+                        <button class="btn btn-success mt-3">Iniciar sesión con Google</button>
+                    </a>
+                </div>
+            </div>
+        </div>
+    </div>
+<!-- Modal para OPERADORES -->
+<div class="modal fade" id="modalOperador" tabindex="-1" aria-labelledby="modalOperadorLabel" aria-hidden="true">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="modalOperadorLabel">Iniciar sesión como Operador</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Cerrar"></button>
+            </div>
+            <div class="modal-body">
+                <form action="/login-operador" method="post">
+                    <div class="mb-3">
+                        <label for="username" class="form-label">Usuario</label>
+                        <input type="text" class="form-control" id="username" name="username" required>
+                    </div>
+                    <div class="mb-3">
+                        <label for="password" class="form-label">Contraseña</label>
+                        <input type="password" class="form-control" id="password" name="password" required>
+                    </div>
+                    <button type="submit" class="btn btn-success">Iniciar Sesión</button>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+
+
+<!-- Slider -->
 <div class="slider">
     <div class="slides" id="slides">
-        <div class="slide">
-            <img src="/img/consumovf.png" alt="Consumo">
-
-        </div>
-        <div class="slide">
-            <img src="/img/pagosvf.png" alt="Pagos">
-        </div>
-        <div class="slide">
-            <img src="/img/incidenciasvf.png" alt="Incidencias">
-
-        </div>
+        <div class="slide"><img src="/img/consumovf.png" alt="Consumo"></div>
+        <div class="slide"><img src="/img/pagosvf.png" alt="Pagos"></div>
+        <div class="slide"><img src="/img/incidenciasvf.png" alt="Incidencias"></div>
     </div>
-
     <div class="controls">
         <span class="dot active" onclick="goToSlide(0)"></span>
         <span class="dot" onclick="goToSlide(1)"></span>
@@ -228,46 +275,43 @@
     </div>
 </div>
 
-<!-- BOTÓN DE PAGO -->
+<!-- Pago -->
 <section class="pago">
     <h2>Botón de Pago</h2>
-    <p>Para iniciar el proceso de pago por favor digite su número de cuenta, que se encuentra en la parte superior derecha de su factura.</p>
+    <p>Para iniciar el proceso de pago por favor digite su número de cuenta, que se encuentra en la parte superior
+        derecha de su factur:</p>
     <input type="text" placeholder="Ej: CUN523864" />
     <button>PAGAR</button>
 </section>
 
-<!-- REPORTE DE INCIDENTES -->
+<!-- Incidentes -->
 <section class="incidente">
     <h2>REPORTE SU INCIDENTE</h2>
     <form>
-        <div class="form-grid">
-            <input type="text" placeholder="Nombre" required name="nombre" />
-            <input type="text" placeholder="Cuenta asociada" required name="cuenta" />
-            <input type="email" placeholder="Correo electrónico" required name="correo" />
-            <textarea placeholder="Descripción" required name="descripcion"></textarea>
-        </div>
+        <input type="text" placeholder="Nombre" required name="nombre" />
+        <input type="text" placeholder="Cuenta asociada" required name="cuenta" />
+        <input type="email" placeholder="Correo electrónico" required name="correo" />
+        <textarea placeholder="Descripción" required name="descripcion"></textarea>
         <button type="submit">ENVIAR</button>
         <div class="note">Recuerde que el reporte detallado lo puede realizar iniciando sesión.</div>
     </form>
 </section>
 
-<!-- FOOTER -->
+<!-- Footer -->
 <footer>
     <div class="footer-section">
         <h4>Síganos en redes</h4>
-        <div class="social-icons">
-            <a href="#"><span></span></a>
-
-        </div>
+        <p>Próximamente en nuestras plataformas digitales</p>
     </div>
     <div class="footer-section">
         <h4>CONTACTO</h4>
-        <p>Dirección: Cra. 5 # 21-38, Santa Fé, Bogotá, Cundinamarca</p>
-        <p>Correo: contacto@energiainteligente.com</p>
-        <p>Horario de atención: Lunes a viernes de 8:30am a 5:00pm</p>
+        <p>Cra. 5 #21-38, Santa Fé, Bogotá</p>
+        <p>Email: contacto@energiainteligente.com</p>
+        <p>Lunes a viernes, 8:30am a 5:00pm</p>
     </div>
 </footer>
 
+<!-- Scripts -->
 <script>
     let currentIndex = 0;
     const slides = document.getElementById('slides');
@@ -290,5 +334,8 @@
     }, 6000);
 </script>
 
+<!--  Bootstrap JS -->
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
 </body>
 </html>
+
