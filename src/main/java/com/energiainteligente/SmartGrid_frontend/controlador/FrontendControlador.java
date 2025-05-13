@@ -6,18 +6,9 @@ import org.springframework.web.bind.annotation.GetMapping;
 @Controller
 public class FrontendControlador {
 
-    @GetMapping("/login")
+    @GetMapping("/index")
     public String login() {
-        return "login";
+        return "index.html";
     }
 
-    @GetMapping("/validar-cliente")
-    public String validarCliente() {
-        return "validar-cliente";
-    }
-
-    @GetMapping("/validar-empleado")
-    public String validarEmpleado() {
-        return "validar-empleado";
-    }
 }
