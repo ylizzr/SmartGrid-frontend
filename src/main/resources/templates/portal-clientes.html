@@ -1,0 +1,95 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Portal de Clientes</title>
+    <link rel="stylesheet" href="css/clientes.css">
+</head>
+<body>
+<header>
+    <div class="container">
+        <div class="logo">
+            <img src="/img/logo.png" alt="Energía Inteligente">
+        </div>
+        <button>CERRAR SESIÓN</button>
+    </div>
+</header>
+
+<section class="welcome-section">
+    <div class="container">
+        <h2>Bienvenido(a) a Energía Inteligente</h2>
+        <p>(nombre cliente)</p>
+    </div>
+</section>
+
+<section>
+    <div class="container">
+        <div class="menu">
+            <ul>
+                <li class="active">Menu</li>
+                <li>Reporte incidencias</li>
+                <li>Facturas y pagos</li>
+                <li>Notificaciones</li>
+            </ul>
+        </div>
+        <div class="content-area">
+            <div class="empty-message">Seleccione una opción del menú</div>
+
+            <!-- Contenido para Reporte incidencias -->
+            <div class="content" id="reporte-incidencias">
+                <h2>Reporte de Incidencias</h2>
+                <p>Contenido del reporte de incidencias...</p>
+            </div>
+
+            <!-- Contenido para Facturas y pagos -->
+            <div class="content" id="facturas-pagos">
+                <h2>Facturas y Pagos</h2>
+                <p>Contenido de facturas y pagos...</p>
+            </div>
+
+            <!-- Contenido para Notificaciones -->
+            <div class="content" id="notificaciones">
+                <h2>Notificaciones</h2>
+                <p>Contenido de notificaciones...</p>
+            </div>
+        </div>
+    </div>
+</section>
+
+<footer>
+    <div class="container">
+        <p>&copy; 2025 Energía Inteligente</p>
+    </div>
+</footer>
+
+<script>
+    document.addEventListener('DOMContentLoaded', function() {
+        const menuItems = document.querySelectorAll('.menu ul li');
+        const contents = document.querySelectorAll('.content');
+        const emptyMessage = document.querySelector('.empty-message');
+
+        menuItems.forEach(item => {
+            item.addEventListener('click', function() {
+                // Remover clase active de todos los items
+                menuItems.forEach(i => i.classList.remove('active'));
+                // Añadir clase active al item seleccionado
+                this.classList.add('active');
+
+                // Ocultar todos los contenidos
+                contents.forEach(c => c.classList.remove('active'));
+
+                // Mostrar mensaje vacío o contenido correspondiente
+                if(this.textContent === 'Menu') {
+                    emptyMessage.style.display = 'block';
+                } else {
+                    emptyMessage.style.display = 'none';
+                    const contentId = this.textContent.toLowerCase().replace(/\s+/g, '-');
+                    document.getElementById(contentId).classList.add('active');
+                }
+            });
+        });
+    });
+</script>
+</body>
+</html>

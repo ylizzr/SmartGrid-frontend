@@ -166,7 +166,7 @@ header img {
 
 /* Estilos de las secciones de pago e incidentes */
 section.pago {
-    background-color: #f88641;
+    background-color: #b2dbcf;
     padding: 40px 20px;
     text-align: center;
 }
@@ -175,6 +175,7 @@ section.pago {
     display: flex;
     justify-content: center;
     align-items: center;
+    background-color: #b2dbcf;
     gap: 15px;
     margin-top: 10px;
     width: 80%;
@@ -185,7 +186,7 @@ section.pago {
 
 section.incidente {
     padding: 40px 20px;
-    background: #f2f2f2;
+    background: #ffffff;
     text-align: center;
 }
 
@@ -224,33 +225,33 @@ section.pago button, .incidente form > button {
     font-size: 0.9em;
 }
 
-/* Estilos específicos para el formulario de incidentes */
+
 .incidente form {
     display: grid;
-    grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); /* Crea columnas flexibles */
-    gap: 15px; /* Espacio entre los elementos del grid */
-    max-width: 800px; /* Ancho máximo del formulario */
-    margin: 20px auto; /* Centra el formulario */
-    text-align: left; /* Alinea el texto a la izquierda dentro del formulario */
+    grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+    gap: 15px; /
+    max-width: 800px;
+    margin: 20px auto;
+    text-align: left;
 }
 
 .incidente form > label {
     font-size: 0.9em;
     color: #555;
     margin-bottom: 5px;
-    display: block; /* Asegura que la etiqueta esté encima del input */
+    display: block;
 }
 
 .incidente form > input:not([type="email"]),
 .incidente form > input[type="email"] {
-    width: 100%; /* Los inputs ocupan todo el ancho de su celda */
-    box-sizing: border-box; /* Incluye el padding y el borde en el ancho */
+    width: 100%;
+    box-sizing: border-box;
 }
 
 .incidente form > textarea {
     width: 100%;
     box-sizing: border-box;
-    grid-column: 1 / -1; /* El textarea ocupa toda la fila */
+    grid-column: 1 / -1;
     min-height: 100px;
 }
 
@@ -293,8 +294,3 @@ footer {
     font-size: 0.9em;
 }
 
-.social-icons a {
-    margin-right: 8px;
-    font-size: 1.3em;
-    text-decoration: none;
-}

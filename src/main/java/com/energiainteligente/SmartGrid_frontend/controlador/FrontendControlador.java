@@ -1,7 +1,10 @@
 package com.energiainteligente.SmartGrid_frontend.controlador;
 
 import org.springframework.stereotype.Controller;
+import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.RequestParam;
 
 @Controller
 public class FrontendControlador {
@@ -11,4 +14,19 @@ public class FrontendControlador {
         return "index.html";
     }
 
+    @GetMapping("/portal-clientes")
+    public String clientes() {
+        return "portal-clientes";
+    }
+
+    @GetMapping("/pago")
+    public String mostrarFormularioPago() {
+        return "pago-form"; // crea un archivo pago-form.html en /templates
+    }
+
+    @PostMapping("/pago")
+    public String procesarPago(@RequestParam("cuenta") String cuenta, Model model) {
+        model.addAttribute("mensaje", "Pago procesado para la cuenta: " + cuenta);
+        return "pago-confirmado";
+    }
 }

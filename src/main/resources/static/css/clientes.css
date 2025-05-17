@@ -1,0 +1,162 @@
+/* Estilos generales */
+body {
+    font-family: Arial, sans-serif;
+    margin: 0;
+    padding: 0;
+    background-color: #ffffff; /* Fondo blanco */
+    color: #333;
+}
+
+.container {
+    width: 80%;
+    margin: auto;
+    overflow: hidden;
+}
+
+/* Estilos del encabezado */
+header {
+    background-color: #B2DBCF; /* Fondo blanco */
+    color: #000;
+    padding: 20px 0;
+    box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
+    border-bottom: 1px solid #eee;
+}
+
+header h1 {
+    margin: 0;
+    display: inline-block;
+}
+
+.logo {
+    display: inline-block;
+    vertical-align: middle;
+    margin-right: 10px;
+}
+
+.logo img {
+    height: 70px;
+}
+
+header button {
+    float: right;
+    padding: 10px 15px;
+    border: none;
+    background-color: #065B4E;
+    color: white;
+    cursor: pointer;
+    border-radius: 5px;
+    font-weight: bold;
+    transition: background-color 0.3s;
+}
+
+header button:hover {
+    background-color: #04453a;
+}
+
+/* Sección de bienvenida */
+.welcome-section {
+    background-color: #ffffff;
+    padding: 20px;
+    margin: 20px 0;
+    border-bottom: 1px solid #eee;
+}
+
+.welcome-section h2 {
+    color: #065B4E;
+    margin-bottom: 5px;
+}
+
+.welcome-section p {
+    color: #666;
+    font-style: italic;
+}
+
+/* Menú principal */
+.menu {
+    width: 20%;
+    float: left;
+    background-color: #ffffff;
+    margin-right: 2%;
+}
+
+.menu ul {
+    list-style-type: none;
+    padding: 0;
+    margin: 0;
+}
+
+.menu ul li {
+    padding: 15px;
+    cursor: pointer;
+    transition: background-color 0.3s;
+    color: #065B4E;
+    font-weight: bold;
+    border-bottom: 1px solid #eee;
+}
+
+.menu ul li:first-child {
+    background-color: #f5f5f5;
+    color: #000;
+}
+
+.menu ul li:hover, .menu ul li.active {
+    background-color: #e8f5ee;
+}
+
+/* Área de contenido */
+.content-area {
+    width: 78%;
+    float: right;
+    min-height: 300px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.empty-message {
+    color: #999;
+    font-size: 18px;
+    text-align: center;
+    padding: 40px;
+    background-color: #f5f5f5;
+    border-radius: 5px;
+    width: 100%;
+}
+
+/* Estilos para el contenido cuando se selecciona una opción */
+.content {
+    display: none;
+    width: 100%;
+    padding: 20px;
+    background-color: #ffffff;
+    border: 1px solid #eee;
+    border-radius: 5px;
+}
+
+.content.active {
+    display: block;
+}
+
+/* Pie de página */
+footer {
+    clear: both;
+    background-color: #ffffff;
+    color: #666;
+    text-align: center;
+    padding: 15px 0;
+    margin-top: 20px;
+    border-top: 1px solid #eee;
+}
+
+/* Responsive design */
+@media (max-width: 768px) {
+    .container {
+        width: 95%;
+    }
+
+    .menu, .content-area {
+        width: 100%;
+        float: none;
+        margin-bottom: 20px;
+    }
+}
