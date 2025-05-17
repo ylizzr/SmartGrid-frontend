@@ -19,6 +19,11 @@ public class FrontendControlador {
         return "portal-clientes";
     }
 
+    @GetMapping("/portal-operadores")
+    public String operadores() {
+        return "portal-operadores";
+    }
+
     @GetMapping("/pago")
     public String mostrarFormularioPago() {
         return "pago-form"; // crea un archivo pago-form.html en /templates
