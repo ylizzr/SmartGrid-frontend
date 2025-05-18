@@ -12,14 +12,14 @@
         <div class="logo">
             <img src="/img/logo.png" alt="Energía Inteligente">
         </div>
-        <button>CERRAR SESIÓN</button>
+        <button onclick="cerrarSesion()">CERRAR SESIÓN</button>
     </div>
 </header>
 
 <section class="welcome-section">
     <div class="container">
         <h2>Bienvenido(a) al Portal de Operadores</h2>
-        <p>(nombre del operador)</p>
+        <p id="nombreOperador"></p>
     </div>
 </section>
 
@@ -33,6 +33,7 @@
                 <li>Mapa</li>
                 <li>Facturación</li>
                 <li>Clientes</li>
+                <li>Empleados</li>
             </ul>
         </div>
 
@@ -72,7 +73,7 @@
             </div>
 
             <!-- FACTURACIÓN -->
-            <div class="content" id="facturación">
+            <div class="content" id="facturacion">
                 <h2>Gestión de Facturación</h2>
                 <form id="factura-form">
                     <label>ID:</label>
@@ -91,17 +92,35 @@
             <div class="content" id="clientes">
                 <h2>Gestión de Clientes</h2>
                 <form id="cliente-form">
-                    <label>ID:</label>
-                    <input type="text" class="form-control" placeholder="ID del cliente">
                     <label>Nombre:</label>
-                    <input type="text" class="form-control" placeholder="Nombre completo">
+                    <input type="text" name="nombre" class="form-control" required>
                     <label>Correo:</label>
-                    <input type="email" class="form-control" placeholder="Correo">
+                    <input type="email" name="correo" class="form-control" required>
                     <label>Teléfono:</label>
-                    <input type="tel" class="form-control" placeholder="Teléfono">
+                    <input type="tel" name="celular" class="form-control">
                     <label>Número de cuenta:</label>
-                    <input type="text" class="form-control" placeholder="Cuenta">
-                    <button type="submit" class="btn btn-primary">Guardar</button>
+                    <input type="text" name="numeroCuenta" class="form-control" required>
+                    <label>Dirección:</label>
+                    <input type="text" name="direccion" class="form-control">
+                    <button type="submit" class="btn btn-primary">Guardar Cliente</button>
+                </form>
+            </div>
+
+            <!-- EMPLEADOS -->
+            <div class="content" id="empleados">
+                <h2>Gestión de Empleados</h2>
+                <form id="empleado-form">
+                    <label>Cédula:</label>
+                    <input type="text" name="cedula" class="form-control" required>
+                    <label>Usuario:</label>
+                    <input type="text" name="usuario" class="form-control" required>
+                    <label>Contraseña:</label>
+                    <input type="password" name="contrasena" class="form-control" required>
+                    <label>Nombre:</label>
+                    <input type="text" name="nombre" class="form-control">
+                    <label>Área Encargada:</label>
+                    <input type="text" name="areaEncargada" class="form-control">
+                    <button type="submit" class="btn btn-primary">Guardar Empleado</button>
                 </form>
             </div>
         </div>
@@ -124,25 +143,42 @@
             item.addEventListener('click', function() {
                 menuItems.forEach(i => i.classList.remove('active'));
                 this.classList.add('active');
-
                 contents.forEach(c => c.classList.remove('active'));
 
                 if(this.textContent === 'Menu') {
                     emptyMessage.style.display = 'block';
                 } else {
                     emptyMessage.style.display = 'none';
-                    const contentId = this.textContent.toLowerCase().replace(/\s+/g, '-');
+                    const contentId = this.textContent.toLowerCase().replace(/\s+/g, '-').normalize("NFD").replace(/[̀-ͯ]/g, "");
                     const target = document.getElementById(contentId);
                     if (target) target.classList.add('active');
                 }
             });
         });
 
+        // Crear Cliente
         document.getElementById('cliente-form').addEventListener('submit', e => {
             e.preventDefault();
-            alert('Cliente guardado (simulación)');
+            const data = Object.fromEntries(new FormData(e.target));
+            fetch("http://localhost:8080/api/admin/clientes", {
+                method: "POST",
+                headers: { "Content-Type": "application/json" },
+                body: JSON.stringify(data)
+            }).then(res => res.ok && alert("Cliente guardado correctamente"));
         });
 
+        // Crear Empleado
+        document.getElementById('empleado-form').addEventListener('submit', e => {
+            e.preventDefault();
+            const data = Object.fromEntries(new FormData(e.target));
+            fetch("http://localhost:8080/api/admin/empleados", {
+                method: "POST",
+                headers: { "Content-Type": "application/json" },
+                body: JSON.stringify(data)
+            }).then(res => res.ok && alert("Empleado guardado correctamente"));
+        });
+
+        // Simular Incidencia y Factura
         document.getElementById('factura-form').addEventListener('submit', e => {
             e.preventDefault();
             alert('Factura guardada (simulación)');
@@ -153,6 +189,10 @@
             alert('Incidencia guardada (simulación)');
         });
     });
+
+    function cerrarSesion() {
+        window.location.href = "/";
+    }
 </script>
 </body>
 </html>
