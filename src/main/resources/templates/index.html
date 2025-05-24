@@ -151,7 +151,8 @@ function validarLoginOperador() {
     const clave = document.getElementById("operadorPassword").value;
     const error = document.getElementById("errorOperador");
 
-    fetch("http://localhost:8080/api/empleado/login", {
+    fetch("http://localhost:8080/api/empleado/login",
+     {
         method: "POST",
         headers: {
             "Content-Type": "application/x-www-form-urlencoded"
