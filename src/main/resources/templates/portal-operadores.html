@@ -341,7 +341,7 @@
     </div>
 </footer>
 <script>
-    // Variables globales
+    // ==================== VARIABLES GLOBALES ====================
     let clientes = [];
     let empleados = [];
     let modoEdicionCliente = false;
@@ -350,7 +350,7 @@
     let empleadoEditando = null;
 
     document.addEventListener('DOMContentLoaded', function () {
-        // Menú con data-target
+        // Menú y secciones
         const menuItems = document.querySelectorAll('.menu ul li');
         const contents = document.querySelectorAll('.content');
         const emptyMessage = document.querySelector('.empty-message');
@@ -369,20 +369,21 @@
                     const target = document.getElementById(contentId);
                     if (target) target.classList.add('active');
 
-                    if (contentId === 'clientes') cargarClientes();
-                    if (contentId === 'empleados') cargarEmpleados();
+                    //if (contentId === 'clientes') cargarClientes();
+                    //if (contentId === 'empleados') cargarEmpleados();
                 }
             });
         });
 
-        // Eventos
+        // Eventos - Clientes
         document.getElementById('cliente-form').addEventListener('submit', manejarCliente);
-        document.getElementById('btn-search-cliente').addEventListener('click', buscarCliente);
+        document.getElementById('btn-search-cliente').addEventListener('click', () => {
+            const filtro = document.getElementById('search-cliente').value.trim();
+            buscarClientes(filtro);
+        });
         document.getElementById('search-btn').addEventListener('click', cargarClientes);
 
-        document.getElementById('empleado-form').addEventListener('submit', manejarEmpleado);
-        document.getElementById('btn-search-empleado').addEventListener('click', buscarEmpleados);
-        document.getElementById('search-btn-empleados').addEventListener('click', cargarEmpleados);
+
     });
 
     // ==================== CLIENTES ====================
@@ -390,16 +391,38 @@
         try {
             const response = await fetch("http://localhost:8080/api/admin/clientes");
             if (!response.ok) throw new Error("Error al cargar clientes");
-            clientes = await response.json();
-            renderizarClientes(clientes);
+            const data = await response.json();
+            clientes = data;
+            renderizarClientes(data);
         } catch (error) {
             console.error("Error:", error);
             alert("Error al cargar clientes: " + error.message);
         }
     }
 
+    async function buscarClientes(filtro) {
+        if (!filtro) return alert("Ingresa un valor para buscar");
+
+        try {
+            const response = await fetch(`http://localhost:8080/api/admin/clientes/buscar?filtro=${encodeURIComponent(filtro)}`);
+            if (!response.ok) throw new Error("Error al buscar clientes");
+
+            const resultados = await response.json();
+            if (resultados.length > 0) {
+                renderizarClientes(resultados);
+            } else {
+                alert("No se encontraron clientes");
+                document.getElementById('clientes-table').querySelector('tbody').innerHTML = '';
+                document.getElementById("resultados-clientes").style.display = "none";
+            }
+        } catch (error) {
+            console.error("Error:", error);
+            alert("Error al buscar clientes: " + error.message);
+        }
+    }
+
     function renderizarClientes(lista) {
-        const tbody = document.querySelector('#clientes-table tbody');
+        const tbody = document.getElementById('clientes-table').querySelector('tbody');
         tbody.innerHTML = '';
         lista.forEach(cliente => {
             const tr = document.createElement('tr');
@@ -419,35 +442,13 @@
 
         document.getElementById("resultados-clientes").style.display = "block";
 
-        document.querySelectorAll('.btn-edit').forEach(btn => {
-            btn.addEventListener('click', () => editarCliente(btn.dataset.id));
-        });
-        document.querySelectorAll('.btn-delete').forEach(btn => {
-            btn.addEventListener('click', () => eliminarCliente(btn.dataset.id));
-        });
+        document.querySelectorAll('.btn-edit').forEach(btn =>
+            btn.addEventListener('click', () => editarCliente(btn.dataset.id))
+        );
+        document.querySelectorAll('.btn-delete').forEach(btn =>
+            btn.addEventListener('click', () => eliminarCliente(btn.dataset.id))
+        );
     }
-    async function buscarCliente() {
-        const filtro = document.getElementById('search-cliente').value.trim();
-        if (!filtro) return alert("Ingresa un valor para buscar");
-
-        try {
-            const response = await fetch(`http://localhost:8080/api/admin/clientes/buscar?filtro=${encodeURIComponent(filtro)}`);
-            if (!response.ok) throw new Error("Error al buscar clientes");
-
-            const resultados = await response.json();
-            if (resultados.length > 0) {
-                renderizarClientes(resultados);
-            } else {
-                alert("No se encontraron clientes");
-                document.querySelector('#clientes-table tbody').innerHTML = '';
-                document.getElementById("resultados-clientes").style.display = "none";
-            }
-        } catch (error) {
-            console.error("Error:", error);
-            alert("Error al buscar clientes: " + error.message);
-        }
-    }
-
 
     function editarCliente(id) {
         const cliente = clientes.find(c => c.id == id);
@@ -474,6 +475,7 @@
                 method: "DELETE"
             });
             if (!response.ok) throw new Error("Error al eliminar cliente");
+
             alert("Cliente eliminado correctamente");
             cargarClientes();
         } catch (error) {
@@ -501,6 +503,7 @@
             });
 
             if (!response.ok) throw new Error("Error al guardar cliente");
+
             alert(`Cliente ${modoEdicionCliente ? 'actualizado' : 'creado'} correctamente`);
             form.reset();
             modoEdicionCliente = false;
@@ -526,36 +529,7 @@
         }
     }
 
-    function renderizarEmpleados(lista) {
-        const tbody = document.querySelector('#empleados-table tbody');
-        tbody.innerHTML = '';
-        lista.forEach(empleado => {
-            const tr = document.createElement('tr');
-            tr.innerHTML = `
-                <td>${empleado.cedula || ''}</td>
-                <td>${empleado.nombre || ''}</td>
-                <td>${empleado.usuario || ''}</td>
-                <td>${empleado.areaEncargada || ''}</td>
-                <td class="actions">
-                    <button class="btn-edit" data-id="${empleado.cedula}">Editar</button>
-                    <button class="btn-delete" data-id="${empleado.cedula}">Eliminar</button>
-                </td>
-            `;
-            tbody.appendChild(tr);
-        });
-
-        document.getElementById("resultados-empleados").style.display = "block";
-
-        document.querySelectorAll('.btn-edit').forEach(btn => {
-            btn.addEventListener('click', () => editarEmpleado(btn.dataset.id));
-        });
-        document.querySelectorAll('.btn-delete').forEach(btn => {
-            btn.addEventListener('click', () => eliminarEmpleado(btn.dataset.id));
-        });
-    }
-
-    async function buscarEmpleados() {
-        const filtro = document.getElementById('search-empleado').value.trim();
+    async function buscarEmpleados(filtro) {
         if (!filtro) return alert("Ingresa un valor para buscar");
 
         try {
@@ -576,6 +550,33 @@
         }
     }
 
+    function renderizarEmpleados(lista) {
+        const tbody = document.querySelector('#empleados-table tbody');
+        tbody.innerHTML = '';
+        lista.forEach(empleado => {
+            const tr = document.createElement('tr');
+            tr.innerHTML = `
+                <td>${empleado.cedula || ''}</td>
+                <td>${empleado.nombre || ''}</td>
+                <td>${empleado.usuario || ''}</td>
+                <td>${empleado.areaEncargada || ''}</td>
+                <td class="actions">
+                    <button class="btn-edit" data-id="${empleado.cedula}">Editar</button>
+                    <button class="btn-delete" data-id="${empleado.cedula}">Eliminar</button>
+                </td>
+            `;
+            tbody.appendChild(tr);
+        });
+
+        document.getElementById("resultados-empleados").style.display = "block";
+
+        document.querySelectorAll('.btn-edit').forEach(btn =>
+            btn.addEventListener('click', () => editarEmpleado(btn.dataset.id))
+        );
+        document.querySelectorAll('.btn-delete').forEach(btn =>
+            btn.addEventListener('click', () => eliminarEmpleado(btn.dataset.id))
+        );
+    }
 
     function editarEmpleado(cedula) {
         const empleado = empleados.find(e => e.cedula === cedula);
@@ -596,11 +597,13 @@
 
     async function eliminarEmpleado(cedula) {
         if (!confirm('¿Está seguro de eliminar este empleado?')) return;
+
         try {
             const response = await fetch(`http://localhost:8080/api/admin/empleados/${cedula}`, {
                 method: "DELETE"
             });
             if (!response.ok) throw new Error("Error al eliminar empleado");
+
             alert("Empleado eliminado correctamente");
             cargarEmpleados();
         } catch (error) {
@@ -627,6 +630,7 @@
             });
 
             if (!response.ok) throw new Error("Error al guardar empleado");
+
             alert(`Empleado ${modoEdicionEmpleado ? 'actualizado' : 'creado'} correctamente`);
             form.reset();
             modoEdicionEmpleado = false;
@@ -639,6 +643,13 @@
         }
     }
 
+    // Eventos - Empleados
+    document.getElementById('empleado-form').addEventListener('submit', manejarEmpleado);
+    document.getElementById('btn-search-empleado').addEventListener('click', () => {
+        const filtro = document.getElementById('search-empleado').value.trim();
+        buscarEmpleados(filtro);
+        });
+    document.getElementById('search-btn-empleados').addEventListener('click', cargarEmpleados);
 
     // ==================== VARIABLES GLOBALES ====================
     let alertas = [];
