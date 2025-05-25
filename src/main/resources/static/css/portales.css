@@ -436,3 +436,41 @@ footer {
     margin-top: 5px;
     font-size: 14px;
 }
+
+/* Estilos para el contenedor de dispositivos y mapa */
+.devices-container {
+    display: flex;
+    gap: 20px;
+}
+
+.device-list {
+    flex: 1;
+}
+
+.map-view {
+    flex: 2;
+    min-height: 500px;
+}
+
+/* Estilos para la lista de alertas */
+.alerts-container {
+    margin-top: 20px;
+}
+
+.filter-bar {
+    display: flex;
+    gap: 10px;
+    margin-bottom: 15px;
+}
+
+.filter-select {
+    padding: 8px;
+    border: 1px solid #ddd;
+    border-radius: 4px;
+}
+
+/* Estilos para el mapa */
+#map {
+    border-radius: 8px;
+    box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+}

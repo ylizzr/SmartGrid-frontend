@@ -28,6 +28,11 @@ public class FrontendControlador {
     public String mostrarFormularioPago() {
         return "pago-form";
     }
+    @GetMapping("/mapa")
+    public String mapa() {
+        return "mapa";
+    }
+
 
     @PostMapping("/pago")
     public String procesarPago(@RequestParam("cuenta") String cuenta, Model model) {

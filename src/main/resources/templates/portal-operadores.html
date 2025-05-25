@@ -61,16 +61,117 @@
             <!-- ALERTAS -->
             <div class="content" id="alertas">
                 <h2>Gestión de Alertas</h2>
-                <p>Contenido de alertas (por implementar).</p>
-            </div>
+                <div class="form-container">
+                    <form id="alerta-form" class="compact-form">
+                        <div class="form-row">
+                            <div class="form-group">
+                                <label>Dispositivo:</label>
+                                <input type="text" name="dispositivo" class="form-control" required>
+                            </div>
+                            <div class="form-group">
+                                <label>Tipo:</label>
+                                <input type="text" name="tipo" class="form-control" required>
+                            </div>
+                            <div class="form-group">
+                                <label>Severidad:</label>
+                                <select name="severidad" class="form-control" required>
+                                    <option value="Alta">Alta</option>
+                                    <option value="Media">Media</option>
+                                    <option value="Baja">Baja</option>
+                                </select>
+                            </div>
+                        </div>
+                        <div class="form-row">
+                            <div class="form-group full-width">
+                                <label>Descripción:</label>
+                                <textarea name="descripcion" class="form-control" rows="3" required></textarea>
+                            </div>
+                        </div>
+                        <div class="form-actions">
+                            <button type="submit" class="btn btn-primary">Guardar Alerta</button>
+                            <button type="reset" class="btn btn-secondary">Limpiar</button>
+                        </div>
+                    </form>
+                </div>
 
-            <!-- MAPA -->
-            <div class="content" id="mapa">
-                <h2>Mapa de Operaciones</h2>
-                <div style="height: 300px; background-color: #eee; text-align: center; padding: 100px;">
-                    Mapa interactivo (próximamente)
+                <div class="table-container">
+                    <h3>Alertas Recientes</h3>
+                    <div class="filter-bar">
+                        <select id="alert-filter" class="filter-select">
+                            <option value="all">Todas</option>
+                            <option value="high">Alta Severidad</option>
+                            <option value="medium">Media Severidad</option>
+                            <option value="low">Baja Severidad</option>
+                        </select>
+                        <button onclick="filtrarAlertas()">Filtrar</button>
+                    </div>
+                    <table id="alertas-table" class="data-table">
+                        <thead>
+                        <tr>
+                            <th>Dispositivo</th>
+                            <th>Tipo</th>
+                            <th>Descripción</th>
+                            <th>Severidad</th>
+                            <th>Fecha</th>
+                        </tr>
+                        </thead>
+                        <tbody id="alertas-body">
+                        <!-- Datos dinámicos -->
+                        </tbody>
+                    </table>
                 </div>
             </div>
+
+
+            <!-- MAPA -->
+            <!-- MAPA -->
+            <div class="content" id="mapa">
+                <h2>Gestión de Dispositivos</h2>
+                <div class="form-container">
+                    <form id="dispositivo-form" class="compact-form">
+                        <div class="form-row">
+                            <div class="form-group">
+                                <label>Nombre:</label>
+                                <input type="text" name="nombre" class="form-control" required>
+                            </div>
+                            <div class="form-group">
+                                <label>Tipo:</label>
+                                <select name="tipo" class="form-control" required>
+                                    <option value="Sensor">Sensor</option>
+                                    <option value="Medidor">Medidor</option>
+                                    <option value="Controlador">Controlador</option>
+                                    <option value="Panel">Panel</option>
+                                </select>
+                            </div>
+                            <div class="form-group">
+                                <label>Estado:</label>
+                                <select name="estado" class="form-control" required>
+                                    <option value="Activo">Activo</option>
+                                    <option value="Inactivo">Inactivo</option>
+                                    <option value="Mantenimiento">Mantenimiento</option>
+                                </select>
+                            </div>
+                        </div>
+                        <div class="form-row">
+                            <div class="form-group full-width">
+                                <label>Ubicación:</label>
+                                <input type="text" name="ubicacion" id="ubicacion-input" class="form-control" required readonly>
+                                <input type="hidden" name="coordenadas" id="coordenadas-input">
+                                <small class="text-muted">Haz clic en "Seleccionar en Mapa" para elegir la ubicación</small>
+                            </div>
+                        </div>
+                        <div class="form-actions">
+                            <button type="button" class="btn btn-secondary" onclick="abrirMapaParaSeleccionar()">Seleccionar en Mapa</button>
+                            <button type="submit" class="btn btn-primary">Guardar Dispositivo</button>
+                            <button type="reset" class="btn btn-secondary">Limpiar</button>
+                        </div>
+                    </form>
+                </div>
+
+                <!-- Resto del contenido... -->
+            </div>
+
+
 
             <!-- FACTURACIÓN -->
             <div class="content" id="facturacion">
@@ -538,6 +639,305 @@
             alert("Error al guardar empleado: " + error.message);
         }
     }
+
+
+    // ==================== FUNCIONES PARA DISPOSITIVOS ====================
+
+    function abrirMapaParaSeleccionar() {
+        const form = document.getElementById('dispositivo-form');
+        const formData = {
+            nombre: form.nombre.value,
+            tipo: form.tipo.value,
+            estado: form.estado.value,
+            ubicacion: form.ubicacion.value,
+            coordenadas: form.coordenadas.value
+        };
+
+        sessionStorage.setItem("formularioDispositivo", JSON.stringify(formData));
+        window.open("mapa", "_blank");
+    }
+
+    // Escuchar mensajes del mapa (para cuando se selecciona una ubicación)
+    window.addEventListener('message', function(event) {
+        if (event.data.type === 'ubicacionSeleccionada') {
+            const form = document.getElementById('dispositivo-form');
+            form.ubicacion.value = event.data.direccion;
+            form.coordenadas.value = event.data.coordenadas;
+        }
+    });
+
+    async function cargarDispositivos() {
+        try {
+            const response = await fetch("http://localhost:8081/api/dispositivos");
+            if (!response.ok) throw new Error("Error al cargar dispositivos");
+
+            const dispositivos = await response.json();
+            renderizarDispositivos(dispositivos);
+        } catch (error) {
+            console.error("Error:", error);
+            alert("Error al cargar dispositivos: " + error.message);
+        }
+    }
+
+    function renderizarDispositivos(listaDispositivos) {
+        const tbody = document.getElementById('dispositivos-body');
+        tbody.innerHTML = '';
+
+        listaDispositivos.forEach(dispositivo => {
+            const tr = document.createElement('tr');
+            tr.innerHTML = `
+                <td>${dispositivo.nombre || ''}</td>
+                <td>${dispositivo.tipo || ''}</td>
+                <td>${dispositivo.ubicacion || ''}</td>
+                <td>${dispositivo.estado || ''}</td>
+                <td class="actions">
+                    <button class="btn-alerts" data-id="${dispositivo.id}">Ver Alertas</button>
+                    <button class="btn-edit" data-id="${dispositivo.id}">Editar</button>
+                </td>
+            `;
+            tbody.appendChild(tr);
+        });
+
+        // Agregar eventos a los botones
+        document.querySelectorAll('.btn-alerts').forEach(btn => {
+            btn.addEventListener('click', () => {
+                const dispositivoId = btn.dataset.id;
+                cargarAlertasDispositivo(dispositivoId);
+                document.querySelector('.menu li:nth-child(3)').click();
+            });
+        });
+
+        document.querySelectorAll('.btn-edit').forEach(btn => {
+            btn.addEventListener('click', () => editarDispositivo(btn.dataset.id));
+        });
+    }
+
+    async function editarDispositivo(id) {
+        try {
+            const response = await fetch(`http://localhost:8081/api/dispositivos/${id}`);
+            if (!response.ok) throw new Error("Error al cargar dispositivo");
+
+            const dispositivo = await response.json();
+            const form = document.getElementById('dispositivo-form');
+
+            form.nombre.value = dispositivo.nombre || '';
+            form.tipo.value = dispositivo.tipo || '';
+            form.estado.value = dispositivo.estado || '';
+            form.ubicacion.value = dispositivo.ubicacion || '';
+            form.coordenadas.value = dispositivo.coordenadas || '';
+
+            // Cambiar el texto del botón de submit
+            form.querySelector('button[type="submit"]').textContent = 'Actualizar Dispositivo';
+            form.dataset.editando = id;
+        } catch (error) {
+            console.error("Error:", error);
+            alert("Error al cargar dispositivo: " + error.message);
+        }
+    }
+
+    async function manejarDispositivo(e) {
+        e.preventDefault();
+        const form = e.target;
+        const data = {
+            nombre: form.nombre.value,
+            tipo: form.tipo.value,
+            estado: form.estado.value,
+            ubicacion: form.ubicacion.value,
+            coordenadas: form.coordenadas.value
+        };
+
+        if (!data.coordenadas) {
+            alert("Por favor seleccione una ubicación en el mapa");
+            return;
+        }
+
+        try {
+            let response;
+            const url = form.dataset.editando
+                ? `http://localhost:8081/api/dispositivos/${form.dataset.editando}`
+                : "http://localhost:8081/api/dispositivos";
+
+            const method = form.dataset.editando ? "PUT" : "POST";
+
+            response = await fetch(url, {
+                method,
+                headers: { "Content-Type": "application/json" },
+                body: JSON.stringify(data)
+            });
+
+            if (!response.ok) throw new Error("Error al guardar dispositivo");
+
+            alert(`Dispositivo ${form.dataset.editando ? 'actualizado' : 'creado'} correctamente`);
+            form.reset();
+            delete form.dataset.editando;
+            form.querySelector('button[type="submit"]').textContent = 'Guardar Dispositivo';
+            cargarDispositivos();
+        } catch (error) {
+            console.error("Error:", error);
+            alert("Error al guardar dispositivo: " + error.message);
+        }
+    }
+
+    // Agregar el event listener para el formulario
+    document.getElementById('dispositivo-form').addEventListener('submit', manejarDispositivo);
+
+
+
+    // ==================== FUNCIONES PARA ALERTAS ====================
+    async function cargarTodasLasAlertas() {
+        try {
+            const response = await fetch("http://localhost:8082/api/alertas");
+            if (!response.ok) throw new Error("Error al cargar alertas");
+
+            alertas = await response.json(); // Actualizado para usar la variable global
+            renderizarAlertas(alertas);
+        } catch (error) {
+            console.error("Error:", error);
+            alert("Error al cargar alertas: " + error.message);
+        }
+    }
+
+    async function cargarAlertasDispositivo(dispositivoId) {
+        try {
+            const response = await fetch(`http://localhost:8082/api/alertas/dispositivo/${dispositivoId}`);
+            if (!response.ok) throw new Error("Error al cargar alertas del dispositivo");
+
+            alertas = await response.json();
+            renderizarAlertas(alertas);
+        } catch (error) {
+            console.error("Error:", error);
+            alert("Error al cargar alertas del dispositivo: " + error.message);
+        }
+    }
+
+    function renderizarAlertas(listaAlertas) {
+        const tbody = document.getElementById('alertas-body');
+        tbody.innerHTML = '';
+
+        listaAlertas.forEach(alerta => {
+            const tr = document.createElement('tr');
+            tr.innerHTML = `
+                <td>${alerta.id || ''}</td>
+                <td>${alerta.idDispositivo || ''}</td>
+                <td>${alerta.tipoAlerta || ''}</td>
+                <td>${alerta.descripcion || ''}</td>
+                <td>${alerta.nivelSeveridad || ''}</td>
+                <td>${alerta.fechaHora ? new Date(alerta.fechaHora).toLocaleString() : ''}</td>
+                <td>${alerta.estado || ''}</td>
+                <td class="actions">
+                    <button class="btn-edit" data-id="${alerta.id}">Editar</button>
+                    <button class="btn-delete" data-id="${alerta.id}">Eliminar</button>
+                </td>
+            `;
+            tbody.appendChild(tr);
+        });
+
+        // Agregar eventos a los botones (Agregado)
+        document.querySelectorAll('.btn-edit').forEach(btn => {
+            btn.addEventListener('click', () => editarAlerta(btn.dataset.id));
+        });
+
+        document.querySelectorAll('.btn-delete').forEach(btn => {
+            btn.addEventListener('click', () => eliminarAlerta(btn.dataset.id));
+        });
+    }
+
+    async function editarAlerta(id) {
+        const alerta = alertas.find(a => a.id == id);
+        if (!alerta) return;
+
+        const form = document.getElementById('alerta-form');
+        form.idDispositivo.value = alerta.idDispositivo || '';
+        form.tipoAlerta.value = alerta.tipoAlerta || '';
+        form.descripcion.value = alerta.descripcion || '';
+        form.nivelSeveridad.value = alerta.nivelSeveridad || '';
+        form.estado.value = alerta.estado || '';
+
+        modoEdicionAlerta = true;
+        alertaEditando = alerta;
+
+        // Cambiar el texto del botón
+        form.querySelector('button[type="submit"]').textContent = 'Actualizar Alerta';
+    }
+
+    async function eliminarAlerta(id) {
+        if (!confirm('¿Está seguro de eliminar esta alerta?')) return;
+
+        try {
+            const response = await fetch(`http://localhost:8082/api/alertas/${id}`, {
+                method: "DELETE"
+            });
+
+            if (!response.ok) throw new Error("Error al eliminar alerta");
+
+            alert("Alerta eliminada correctamente");
+            cargarTodasLasAlertas();
+        } catch (error) {
+            console.error("Error:", error);
+            alert("Error al eliminar alerta: " + error.message);
+        }
+    }
+
+    async function manejarAlerta(e) {
+        e.preventDefault();
+        const form = e.target;
+        const data = Object.fromEntries(new FormData(form));
+
+
+        if (!data.idDispositivo.match(/^[0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{12}$/)) {
+            alert("El ID del dispositivo debe ser un UUID válido (ej: xxxxxxxx-xxxx-xxxx-xxxx-xxxxxxxxxxxx)");
+            return;
+        }
+
+        try {
+            let response;
+            const url = modoEdicionAlerta
+                ? `http://localhost:8082/api/alertas/${alertaEditando.id}`
+                : "http://localhost:8082/api/alertas";
+
+            const method = modoEdicionAlerta ? "PUT" : "POST";
+
+            response = await fetch(url, {
+                method,
+                headers: { "Content-Type": "application/json" },
+                body: JSON.stringify(data)
+            });
+
+            if (!response.ok) {
+                const errorText = await response.text();
+                throw new Error(`Error al guardar alerta: ${errorText}`);
+            }
+
+            alert(`Alerta ${modoEdicionAlerta ? 'actualizada' : 'creada'} correctamente`);
+            form.reset();
+            modoEdicionAlerta = false;
+            alertaEditando = null;
+            form.querySelector('button[type="submit"]').textContent = 'Guardar Alerta';
+            cargarTodasLasAlertas();
+        } catch (error) {
+            console.error("Error:", error);
+            alert("Error al guardar alerta: " + error.message);
+        }
+    }
+
+    function filtrarAlertas() {
+        const severidad = document.getElementById('filtro-severidad').value;
+        const estado = document.getElementById('filtro-estado').value;
+
+        const filas = document.querySelectorAll('#alertas-body tr');
+
+        filas.forEach(fila => {
+            const textoSeveridad = fila.cells[4].textContent;
+            const textoEstado = fila.cells[6].textContent;
+
+            const coincideSeveridad = !severidad || textoSeveridad === severidad;
+            const coincideEstado = !estado || textoEstado === estado;
+
+            fila.style.display = (coincideSeveridad && coincideEstado) ? '' : 'none';
+        });
+    }
+
+    // ==================== FUNCIONES DE SESIÓN ====================
 
     function cerrarSesion() {
         window.location.href = "/";
