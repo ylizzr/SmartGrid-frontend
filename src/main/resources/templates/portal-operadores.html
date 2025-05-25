@@ -40,7 +40,6 @@
         <div class="content-area">
             <div class="empty-message">Seleccione una opción del menú</div>
 
-            <!-- INCIDENCIAS -->
             <div class="content" id="incidencias">
                 <h2>Gestión de Incidencias</h2>
                 <form id="incidencia-form">
@@ -58,7 +57,6 @@
                 </form>
             </div>
 
-            <!-- ALERTAS -->
             <div class="content" id="alertas">
                 <h2>Gestión de Alertas</h2>
                 <div class="form-container">
@@ -116,15 +114,12 @@
                         </tr>
                         </thead>
                         <tbody id="alertas-body">
-                        <!-- Datos dinámicos -->
                         </tbody>
                     </table>
                 </div>
             </div>
 
 
-            <!-- MAPA -->
-            <!-- MAPA -->
             <div class="content" id="mapa">
                 <h2>Gestión de Dispositivos</h2>
                 <div class="form-container">
@@ -168,12 +163,33 @@
                     </form>
                 </div>
 
-                <!-- Resto del contenido... -->
+                <div class="search-container">
+                    <input type="text" id="buscar-dispositivo" class="search-input" placeholder="Buscar dispositivos...">
+                    <button id="btn-buscar-dispositivo" class="btn btn-primary">Buscar</button>
+                    <button id="btn-mostrar-todos" class="btn btn-secondary">Mostrar Todos</button>
+                </div>
+
+                <div id="resultados-dispositivos" style="display: none; margin-top: 20px;">
+                    <h3>Resultados de la Búsqueda</h3>
+                    <table class="data-table">
+                        <thead>
+                        <tr>
+                            <th>ID</th>
+                            <th>Nombre</th>
+                            <th>Tipo</th>
+                            <th>Ubicación</th>
+                            <th>Estado</th>
+                            <th>Acciones</th>
+                        </tr>
+                        </thead>
+                        <tbody id="dispositivos-body"></tbody>
+                    </table>
+                </div>
             </div>
 
 
 
-            <!-- FACTURACIÓN -->
+
             <div class="content" id="facturacion">
                 <h2>Gestión de Facturación</h2>
                 <form id="factura-form">
@@ -188,7 +204,7 @@
                     <button type="submit" class="btn btn-primary">Guardar</button>
                 </form>
             </div>
-            <!-- CLIENTES -->
+
             <div class="content" id="clientes">
                 <h2>Gestión de Clientes</h2>
                 <div class="form-container">
@@ -230,12 +246,14 @@
                     </form>
                 </div>
 
-                <div class="table-container">
-                    <h3>Clientes Registrados</h3>
-                    <div class="search-bar">
-                        <input type="text" id="search-cliente" placeholder="Buscar cliente..." class="search-input">
-                        <button class="search-btn">Buscar</button>
-                    </div>
+
+                <div class="search-container">
+                    <input type="text" id="search-cliente" class="search-input" placeholder="Buscar clientes...">
+                    <button id="btn-search-cliente" class="btn btn-primary">Buscar</button>
+                    <button id="search-btn-clientes" class="btn btn-secondary">Mostrar Todos</button>
+                </div>
+                <div id="resultados-clientes" style="display: none; margin-top: 20px;">
+                    <h3>Resultados de la Búsqueda</h3>
                     <table id="clientes-table" class="data-table">
                         <thead>
                         <tr>
@@ -247,17 +265,11 @@
                             <th>Acciones</th>
                         </tr>
                         </thead>
-                        <tbody>
-                        <!-- Datos se llenarán dinámicamente -->
-                        <tr>
-                            <td colspan="5">Cargando datos...</td>
-                        </tr>
-                        </tbody>
+                        <tbody></tbody>
                     </table>
                 </div>
             </div>
 
-            <!-- EMPLEADOS -->
             <div class="content" id="empleados">
                 <h2>Gestión de Empleados</h2>
                 <div class="form-container">
@@ -284,7 +296,7 @@
                         </div>
                         <div class="form-row">
                             <div class="form-group full-width">
-                                <label>Área Encargada:</label>
+                                <label>Cargo:</label>
                                 <input type="text" name="areaEncargada" class="form-control">
                             </div>
                         </div>
@@ -295,12 +307,14 @@
                     </form>
                 </div>
 
-                <div class="table-container">
-                    <h3>Empleados Registrados</h3>
-                    <div class="search-bar">
-                        <input type="text" id="search-empleado" placeholder="Buscar empleado..." class="search-input">
-                        <button class="search-btn">Buscar</button>
-                    </div>
+                <div class="search-container">
+                    <input type="text" id="search-empleado" class="search-input" placeholder="Buscar empleados...">
+                    <button id="btn-search-empleado" class="btn btn-primary">Buscar</button>
+                    <button id="search-btn-empleados" class="btn btn-secondary">Mostrar Todos</button>
+                </div>
+                <div id="resultados-empleados" style="display: none; margin-top: 20px;">
+                    <h3>Resultados de la Búsqueda</h3>
+
                     <table id="empleados-table" class="data-table">
                         <thead>
                         <tr>
@@ -311,12 +325,7 @@
                             <th>Acciones</th>
                         </tr>
                         </thead>
-                        <tbody>
-                        <!-- Datos se llenarán dinámicamente -->
-                        <tr>
-                            <td colspan="5">Cargando datos...</td>
-                        </tr>
-                        </tbody>
+                        <tbody></tbody>
                     </table>
                 </div>
             </div>
@@ -330,13 +339,15 @@
     </div>
 </footer>
 <script>
-    // Variables globales para el estado
+    // Variables globales para el estado (UNA SOLA VEZ)
     let clientes = [];
     let empleados = [];
     let modoEdicionCliente = false;
     let clienteEditando = null;
     let modoEdicionEmpleado = false;
     let empleadoEditando = null;
+    let modoEdicionAlerta = false; // Agregada, asumiendo que la necesitas para alertas
+    let alertaEditando = null; // Agregada
 
     document.addEventListener('DOMContentLoaded', function() {
         // Configuración del menú
@@ -358,60 +369,110 @@
                     const target = document.getElementById(contentId);
                     if (target) target.classList.add('active');
 
-                    // Cargar datos cuando se selecciona la pestaña
-                    if (contentId === 'clientes') cargarClientes();
-                    if (contentId === 'empleados') cargarEmpleados();
+                    // --- CAMBIOS CLAVE AQUÍ ---
+                    if (contentId === 'clientes') {
+                        // Al seleccionar clientes, limpiar el formulario y vaciar la tabla
+                        limpiarFormularioCliente();
+                        renderizarClientes([]); // Muestra la tabla vacía
+                        document.getElementById("resultados-clientes").style.display = "none"; // Ocultar resultados inicialmente
+                    } else if (contentId === 'empleados') {
+                        limpiarFormularioEmpleado(); // Asumiendo que también quieres limpiar empleados
+                        renderizarEmpleados([]); // Muestra la tabla vacía para empleados
+                        document.getElementById("resultados-empleados").style.display = "none"; // Ocultar resultados inicialmente
+                    } else if (contentId === 'mapa') {
+                        // Para Dispositivos, inicializar el formulario y posiblemente no mostrar la tabla
+                        limpiarFormularioDispositivo();
+                        renderizarDispositivos([]); // Vaciar la tabla de dispositivos
+                        document.getElementById("resultados-dispositivos").style.display = "none"; // Ocultar resultados inicialmente
+                    } else if (contentId === 'alertas') {
+                        limpiarFormularioAlerta(); // Limpiar formulario de alertas
+                        renderizarAlertas([]); // Renderizar tabla de alertas vacía
+                        // Aquí puedes decidir si quieres que las alertas se carguen automáticamente o no.
+                        // Si quieres que se carguen al seleccionar la pestaña, descomenta:
+                        // cargarTodasLasAlertas();
+                    }
+                    // --- FIN CAMBIOS CLAVE ---
                 }
             });
         });
 
-        // Formulario de Cliente
-        const clienteForm = document.getElementById('cliente-form');
-        clienteForm.addEventListener('submit', manejarCliente);
-
-        // Botón de búsqueda de clientes
-        document.querySelector('#clientes .search-btn').addEventListener('click', () => {
-            const termino = document.getElementById('search-cliente').value;
-            buscarClientes(termino);
+        // Configurar Event Listeners de formularios y botones de búsqueda
+        document.getElementById('cliente-form').addEventListener('submit', manejarCliente);
+        document.getElementById('btn-search-cliente').addEventListener('click', buscarClientesPorAPI); // Nueva función de búsqueda para clientes
+        document.getElementById('search-btn-clientes').addEventListener('click', () => { // Botón "Mostrar Todos" para clientes
+            document.getElementById('search-cliente').value = ''; // Limpiar el input de búsqueda
+            buscarClientesPorAPI(''); // Cargar todos los clientes (simulando búsqueda vacía)
         });
 
-        // Formulario de Empleado
-        const empleadoForm = document.getElementById('empleado-form');
-        empleadoForm.addEventListener('submit', manejarEmpleado);
-
-        // Botón de búsqueda de empleados
-        document.querySelector('#empleados .search-btn').addEventListener('click', () => {
-            const termino = document.getElementById('search-empleado').value;
-            buscarEmpleados(termino);
+        document.getElementById('empleado-form').addEventListener('submit', manejarEmpleado);
+        document.getElementById('btn-search-empleado').addEventListener('click', buscarEmpleadosPorAPI); // Nueva función de búsqueda para empleados
+        document.getElementById('search-btn-empleados').addEventListener('click', () => { // Botón "Mostrar Todos" para empleados
+            document.getElementById('search-empleado').value = ''; // Limpiar el input de búsqueda
+            buscarEmpleadosPorAPI(''); // Cargar todos los empleados (simulando búsqueda vacía)
         });
 
-        // Cargar datos iniciales si estamos en la sección de clientes o empleados
-        if (window.location.hash === '#clientes') cargarClientes();
-        if (window.location.hash === '#empleados') cargarEmpleados();
+        document.getElementById('dispositivo-form').addEventListener('submit', manejarDispositivo);
+        document.getElementById('btn-buscar-dispositivo').addEventListener('click', () => {
+            const termino = document.getElementById('buscar-dispositivo').value.trim();
+            buscarDispositivos(termino);
+        });
+        document.getElementById('btn-mostrar-todos').addEventListener('click', () => {
+            document.getElementById('buscar-dispositivo').value = '';
+            buscarDispositivos();
+        });
+        document.getElementById('buscar-dispositivo').addEventListener('keypress', (e) => {
+            if (e.key === 'Enter') {
+                const termino = document.getElementById('buscar-dispositivo').value.trim();
+                buscarDispositivos(termino);
+            }
+        });
+
+        document.getElementById('alerta-form').addEventListener('submit', manejarAlerta);
+        // Event listeners para filtros de alertas (asegúrate que los IDs de tus select son correctos)
+        // document.getElementById('alert-filter').addEventListener('change', filtrarAlertas); // Si quieres filtrar al cambiar el select
+        // document.getElementById('otro-filtro').addEventListener('change', filtrarAlertas); // Si tienes más filtros
+
+        // Escuchar mensajes del mapa (se mantiene igual)
+        window.addEventListener('message', function(event) {
+            if (event.data.type === 'ubicacionSeleccionada') {
+                const form = document.getElementById('dispositivo-form');
+                form.ubicacion.value = event.data.direccion;
+                form.coordenadas.value = event.data.coordenadas;
+            }
+        });
     });
 
     // ==================== FUNCIONES PARA CLIENTES ====================
 
-    async function cargarClientes() {
+    // Esta función ahora solo se usa internamente por buscarClientesPorAPI si no hay término
+    async function cargarTodosLosClientes() {
         try {
             const response = await fetch("http://localhost:8080/api/admin/clientes");
-            if (!response.ok) throw new Error("Error al cargar clientes");
+            if (!response.ok) throw new Error("Error al cargar todos los clientes");
 
-            clientes = await response.json();
-            renderizarClientes(clientes);
+            clientes = await response.json(); // Actualizamos la variable global
+            renderizarClientes(clientes); // Renderiza todos los clientes cargados
         } catch (error) {
             console.error("Error:", error);
-            alert("Error al cargar clientes: " + error.message);
+            alert("Error al cargar todos los clientes: " + error.message);
         }
     }
 
     function renderizarClientes(listaClientes) {
         const tbody = document.querySelector('#clientes-table tbody');
-        tbody.innerHTML = '';
+        tbody.innerHTML = ''; // Limpia la tabla existente
+
+        if (listaClientes.length === 0) {
+            tbody.innerHTML = '<tr><td colspan="6" style="text-align: center;">No se encontraron clientes. Realice una búsqueda.</td></tr>';
+            // Mostrar la tabla incluso si está vacía para ver el mensaje
+            document.getElementById("resultados-clientes").style.display = "block";
+            return;
+        }
 
         listaClientes.forEach(cliente => {
             const tr = document.createElement('tr');
             tr.innerHTML = `
+                <td>${cliente.id || ''}</td>
                 <td>${cliente.nombre || ''}</td>
                 <td>${cliente.correo || ''}</td>
                 <td>${cliente.celular || ''}</td>
@@ -424,33 +485,55 @@
             tbody.appendChild(tr);
         });
 
-        // Agregar eventos a los botones
-        document.querySelectorAll('.btn-edit').forEach(btn => {
+        // Asegurarse de que la sección de resultados sea visible
+        document.getElementById("resultados-clientes").style.display = "block";
+
+        // Agregar eventos a los botones de edición y eliminación
+        document.querySelectorAll('#clientes-table .btn-edit').forEach(btn => { // Usar ID de la tabla para más especificidad
             btn.addEventListener('click', () => editarCliente(btn.dataset.id));
         });
 
-        document.querySelectorAll('.btn-delete').forEach(btn => {
+        document.querySelectorAll('#clientes-table .btn-delete').forEach(btn => { // Usar ID de la tabla para más especificidad
             btn.addEventListener('click', () => eliminarCliente(btn.dataset.id));
         });
     }
 
-    async function buscarClientes(termino) {
-        if (!termino) return cargarClientes();
+    // Nueva función para buscar clientes directamente a la API
+    async function buscarClientesPorAPI() {
+        const termino = document.getElementById('search-cliente').value.trim();
 
-        const resultados = clientes.filter(cliente =>
-            cliente.nombre?.toLowerCase().includes(termino.toLowerCase()) ||
-            cliente.correo?.toLowerCase().includes(termino.toLowerCase()) ||
-            cliente.numeroCuenta?.includes(termino)
-        );
+        if (!termino) {
+            // Si el término de búsqueda está vacío, cargamos todos los clientes
+            // O puedes decidir renderizar la tabla vacía con un mensaje
+            return cargarTodosLosClientes();
+        }
 
-        renderizarClientes(resultados);
+        try {
+            // Necesitas un endpoint en tu API de Spring Boot que maneje la búsqueda por término.
+            // Por ejemplo: GET /api/admin/clientes/search?query=<valor>
+            const response = await fetch(`http://localhost:8080/api/admin/clientes/search?query=${encodeURIComponent(termino)}`);
+            if (!response.ok) throw new Error("Error al buscar clientes en la API");
+
+            clientes = await response.json(); // Actualiza la lista global con los resultados de la búsqueda
+            renderizarClientes(clientes); // Renderiza los resultados de la búsqueda
+        } catch (error) {
+            console.error("Error en la búsqueda de clientes:", error);
+            alert("Error al buscar clientes: " + error.message);
+            renderizarClientes([]); // En caso de error, muestra la tabla vacía
+        }
     }
 
+
     async function editarCliente(id) {
-        const cliente = clientes.find(c => c.id === id);
-        if (!cliente) return;
+        // Asegúrate de que 'id' se está pasando correctamente y que 'clientes' está poblado
+        const cliente = clientes.find(c => c.id == id); // Usar == en lugar de === si los tipos pueden variar (string vs number)
+        if (!cliente) {
+            alert('Cliente no encontrado en la lista actual. Intente recargar los datos.');
+            return;
+        }
 
         const form = document.getElementById('cliente-form');
+        form.id.value = cliente.id || '';
         form.nombre.value = cliente.nombre || '';
         form.correo.value = cliente.correo || '';
         form.celular.value = cliente.celular || '';
@@ -475,7 +558,9 @@
             if (!response.ok) throw new Error("Error al eliminar cliente");
 
             alert("Cliente eliminado correctamente");
-            cargarClientes();
+            // Después de eliminar, re-ejecutar la última búsqueda o cargar todos
+            const terminoActual = document.getElementById('search-cliente').value.trim();
+            buscarClientesPorAPI(); // Para refrescar la tabla con el estado actual
         } catch (error) {
             console.error("Error:", error);
             alert("Error al eliminar cliente: " + error.message);
@@ -486,6 +571,15 @@
         e.preventDefault();
         const form = e.target;
         const data = Object.fromEntries(new FormData(form));
+
+        // Si es una creación, el ID no debe ser enviado en el cuerpo si es autoincremental/generado por backend
+        if (!modoEdicionCliente) {
+            delete data.id; // Eliminar el campo 'id' para la creación
+        } else {
+             // Si es edición, asegúrate de que el ID en `data` sea el correcto (del clienteEditando)
+             data.id = clienteEditando.id;
+        }
+
 
         try {
             let response;
@@ -501,26 +595,42 @@
                 body: JSON.stringify(data)
             });
 
-            if (!response.ok) throw new Error("Error al guardar cliente");
+            if (!response.ok) {
+                const errorText = await response.text();
+                throw new Error("Error al guardar cliente: " + errorText);
+            }
 
             alert(`Cliente ${modoEdicionCliente ? 'actualizado' : 'creado'} correctamente`);
-            form.reset();
-            modoEdicionCliente = false;
-            clienteEditando = null;
-            form.querySelector('button[type="submit"]').textContent = 'Guardar Cliente';
-            cargarClientes();
+            limpiarFormularioCliente(); // Limpia el formulario después de guardar/actualizar
+            // Después de guardar/actualizar, re-ejecutar la última búsqueda o cargar todos
+            buscarClientesPorAPI(); // Para refrescar la tabla con el estado actual
         } catch (error) {
             console.error("Error:", error);
             alert("Error al guardar cliente: " + error.message);
         }
     }
 
+    // Nueva función para limpiar el formulario de cliente
+    function limpiarFormularioCliente() {
+        const form = document.getElementById('cliente-form');
+        form.reset();
+        modoEdicionCliente = false;
+        clienteEditando = null;
+        form.querySelector('button[type="submit"]').textContent = 'Guardar Cliente';
+        // Si el campo ID no es generado por el backend, asegúrate de que esté vacío
+        // form.id.value = ''; // Si no es autoincremental y lo reseteas
+    }
+
+
     // ==================== FUNCIONES PARA EMPLEADOS ====================
 
-    async function cargarEmpleados() {
+    // Asumiendo que quieres el mismo comportamiento para empleados:
+    // La tabla vacía hasta que se busca, y el formulario limpio.
+
+    async function cargarTodosLosEmpleados() {
         try {
             const response = await fetch("http://localhost:8080/api/admin/empleados");
-            if (!response.ok) throw new Error("Error al cargar empleados");
+            if (!response.ok) throw new Error("Error al cargar todos los empleados");
 
             empleados = await response.json();
             renderizarEmpleados(empleados);
@@ -533,6 +643,12 @@
     function renderizarEmpleados(listaEmpleados) {
         const tbody = document.querySelector('#empleados-table tbody');
         tbody.innerHTML = '';
+
+        if (listaEmpleados.length === 0) {
+            tbody.innerHTML = '<tr><td colspan="5" style="text-align: center;">No se encontraron empleados. Realice una búsqueda.</td></tr>';
+            document.getElementById("resultados-empleados").style.display = "block";
+            return;
+        }
 
         listaEmpleados.forEach(empleado => {
             const tr = document.createElement('tr');
@@ -549,38 +665,52 @@
             tbody.appendChild(tr);
         });
 
-        // Agregar eventos a los botones
-        document.querySelectorAll('.btn-edit').forEach(btn => {
+        document.getElementById("resultados-empleados").style.display = "block";
+
+        document.querySelectorAll('#empleados-table .btn-edit').forEach(btn => {
             btn.addEventListener('click', () => editarEmpleado(btn.dataset.id));
         });
 
-        document.querySelectorAll('.btn-delete').forEach(btn => {
+        document.querySelectorAll('#empleados-table .btn-delete').forEach(btn => {
             btn.addEventListener('click', () => eliminarEmpleado(btn.dataset.id));
         });
     }
 
-    async function buscarEmpleados(termino) {
-        if (!termino) return cargarEmpleados();
+    async function buscarEmpleadosPorAPI() { // Renombrada para claridad
+        const filtro = document.getElementById('search-empleado').value.trim();
 
-        const resultados = empleados.filter(empleado =>
-            empleado.nombre?.toLowerCase().includes(termino.toLowerCase()) ||
-            empleado.usuario?.toLowerCase().includes(termino.toLowerCase()) ||
-            empleado.cedula?.includes(termino)
-        );
+        if (!filtro) {
+            return cargarTodosLosEmpleados();
+        }
 
-        renderizarEmpleados(resultados);
+        try {
+            // Necesitas un endpoint en tu API de Spring Boot para buscar empleados
+            const response = await fetch(`http://localhost:8080/api/admin/empleados/search?query=${encodeURIComponent(filtro)}`);
+            if (!response.ok) throw new Error("Error al buscar empleados en la API");
+
+            empleados = await response.json(); // Actualiza la lista global
+            renderizarEmpleados(empleados);
+        } catch (error) {
+            console.error("Error en la búsqueda de empleados:", error);
+            alert("Error al buscar empleados: " + error.message);
+            renderizarEmpleados([]); // En caso de error
+        }
     }
 
+
     async function editarEmpleado(cedula) {
-        const empleado = empleados.find(e => e.cedula === cedula);
-        if (!empleado) return;
+        const empleado = empleados.find(e => e.cedula == cedula);
+        if (!empleado) {
+             alert('Empleado no encontrado en la lista actual. Intente recargar los datos.');
+             return;
+        }
 
         const form = document.getElementById('empleado-form');
         form.cedula.value = empleado.cedula || '';
         form.usuario.value = empleado.usuario || '';
         form.nombre.value = empleado.nombre || '';
         form.areaEncargada.value = empleado.areaEncargada || '';
-        form.contrasena.placeholder = "Dejar en blanco para no cambiar";
+        form.contrasena.placeholder = "Dejar en blanco para no cambiar"; // Mantener este placeholder
 
         modoEdicionEmpleado = true;
         empleadoEditando = empleado;
@@ -600,7 +730,7 @@
             if (!response.ok) throw new Error("Error al eliminar empleado");
 
             alert("Empleado eliminado correctamente");
-            cargarEmpleados();
+            buscarEmpleadosPorAPI(); // Refrescar la tabla
         } catch (error) {
             console.error("Error:", error);
             alert("Error al eliminar empleado: " + error.message);
@@ -611,6 +741,14 @@
         e.preventDefault();
         const form = e.target;
         const data = Object.fromEntries(new FormData(form));
+
+        // Si es creación, la cédula puede ser un ID generado por el backend,
+        // si no, asegúrate de que `data.cedula` sea la correcta.
+        // Si la contraseña está vacía y es un PUT, no la envíes para no sobreescribir.
+        if (modoEdicionEmpleado && data.contrasena === "") {
+            delete data.contrasena;
+        }
+
 
         try {
             let response;
@@ -626,22 +764,34 @@
                 body: JSON.stringify(data)
             });
 
-            if (!response.ok) throw new Error("Error al guardar empleado");
+            if (!response.ok) {
+                const errorText = await response.text();
+                throw new Error(`Error al guardar empleado: ${errorText}`);
+            }
 
             alert(`Empleado ${modoEdicionEmpleado ? 'actualizado' : 'creado'} correctamente`);
-            form.reset();
-            modoEdicionEmpleado = false;
-            empleadoEditando = null;
-            form.querySelector('button[type="submit"]').textContent = 'Guardar Empleado';
-            cargarEmpleados();
+            limpiarFormularioEmpleado();
+            buscarEmpleadosPorAPI(); // Refrescar la tabla
         } catch (error) {
             console.error("Error:", error);
             alert("Error al guardar empleado: " + error.message);
         }
     }
 
+    function limpiarFormularioEmpleado() {
+        const form = document.getElementById('empleado-form');
+        form.reset();
+        modoEdicionEmpleado = false;
+        empleadoEditando = null;
+        form.querySelector('button[type="submit"]').textContent = 'Guardar Empleado';
+        form.contrasena.placeholder = ""; // Limpiar placeholder si lo habías puesto
+    }
+
 
     // ==================== FUNCIONES PARA DISPOSITIVOS ====================
+    // Variables de estado para dispositivos (asegúrate de que no se redeclaren en otros lugares)
+    let modoEdicionDispositivo = false;
+    let dispositivoEditando = null;
 
     function abrirMapaParaSeleccionar() {
         const form = document.getElementById('dispositivo-form');
@@ -657,7 +807,7 @@
         window.open("mapa", "_blank");
     }
 
-    // Escuchar mensajes del mapa (para cuando se selecciona una ubicación)
+    // Escuchar mensajes del mapa
     window.addEventListener('message', function(event) {
         if (event.data.type === 'ubicacionSeleccionada') {
             const form = document.getElementById('dispositivo-form');
@@ -666,26 +816,45 @@
         }
     });
 
-    async function cargarDispositivos() {
+    async function buscarDispositivos(termino = '') {
         try {
-            const response = await fetch("http://localhost:8081/api/dispositivos");
-            if (!response.ok) throw new Error("Error al cargar dispositivos");
+            let url = "http://localhost:8081/api/dispositivos";
+            const terminoValido = termino && termino.trim().length > 0;
+
+            if (terminoValido) {
+                url += `/search?query=${encodeURIComponent(termino.trim())}`; // Asumiendo un endpoint de búsqueda
+            }
+
+            const response = await fetch(url);
+            if (!response.ok) throw new Error("Error al buscar dispositivos");
 
             const dispositivos = await response.json();
+            const resultadosDiv = document.getElementById('resultados-dispositivos');
+            resultadosDiv.style.display = 'block'; // Siempre mostrar la tabla después de buscar
+
             renderizarDispositivos(dispositivos);
         } catch (error) {
             console.error("Error:", error);
-            alert("Error al cargar dispositivos: " + error.message);
+            alert("Error al buscar dispositivos: " + error.message);
+            renderizarDispositivos([]); // Renderizar vacío en caso de error
         }
     }
+
 
     function renderizarDispositivos(listaDispositivos) {
         const tbody = document.getElementById('dispositivos-body');
         tbody.innerHTML = '';
+        if (listaDispositivos.length === 0) {
+            const tr = document.createElement('tr');
+            tr.innerHTML = `<td colspan="6" class="no-results">No se encontraron dispositivos</td>`;
+            tbody.appendChild(tr);
+            return;
+        }
 
         listaDispositivos.forEach(dispositivo => {
             const tr = document.createElement('tr');
             tr.innerHTML = `
+                <td>${dispositivo.id || ''}</td>
                 <td>${dispositivo.nombre || ''}</td>
                 <td>${dispositivo.tipo || ''}</td>
                 <td>${dispositivo.ubicacion || ''}</td>
@@ -699,15 +868,17 @@
         });
 
         // Agregar eventos a los botones
-        document.querySelectorAll('.btn-alerts').forEach(btn => {
+        document.querySelectorAll('#dispositivos-body .btn-alerts').forEach(btn => {
             btn.addEventListener('click', () => {
                 const dispositivoId = btn.dataset.id;
                 cargarAlertasDispositivo(dispositivoId);
-                document.querySelector('.menu li:nth-child(3)').click();
+                // Si quieres cambiar a la pestaña de Alertas automáticamente, usa:
+                // document.querySelector('.menu li:nth-child(3)').click(); // Asumiendo que Alertas es la 3ra opción
+                // Y asegúrate de que el ID del dispositivo se maneje en la pestaña de alertas
             });
         });
 
-        document.querySelectorAll('.btn-edit').forEach(btn => {
+        document.querySelectorAll('#dispositivos-body .btn-edit').forEach(btn => {
             btn.addEventListener('click', () => editarDispositivo(btn.dataset.id));
         });
     }
@@ -726,9 +897,11 @@
             form.ubicacion.value = dispositivo.ubicacion || '';
             form.coordenadas.value = dispositivo.coordenadas || '';
 
-            // Cambiar el texto del botón de submit
+            modoEdicionDispositivo = true; // Actualiza el estado de edición
+            dispositivoEditando = dispositivo; // Guarda el objeto completo
+
             form.querySelector('button[type="submit"]').textContent = 'Actualizar Dispositivo';
-            form.dataset.editando = id;
+            // form.dataset.editando = id; // Esto se maneja mejor con la variable dispositivoEditando
         } catch (error) {
             console.error("Error:", error);
             alert("Error al cargar dispositivo: " + error.message);
@@ -753,11 +926,11 @@
 
         try {
             let response;
-            const url = form.dataset.editando
-                ? `http://localhost:8081/api/dispositivos/${form.dataset.editando}`
+            const url = modoEdicionDispositivo
+                ? `http://localhost:8081/api/dispositivos/${dispositivoEditando.id}` // Usar el ID del objeto editando
                 : "http://localhost:8081/api/dispositivos";
 
-            const method = form.dataset.editando ? "PUT" : "POST";
+            const method = modoEdicionDispositivo ? "PUT" : "POST";
 
             response = await fetch(url, {
                 method,
@@ -765,31 +938,38 @@
                 body: JSON.stringify(data)
             });
 
-            if (!response.ok) throw new Error("Error al guardar dispositivo");
+            if (!response.ok) {
+                const errorText = await response.text();
+                throw new Error("Error al guardar dispositivo: " + errorText);
+            }
 
-            alert(`Dispositivo ${form.dataset.editando ? 'actualizado' : 'creado'} correctamente`);
-            form.reset();
-            delete form.dataset.editando;
-            form.querySelector('button[type="submit"]').textContent = 'Guardar Dispositivo';
-            cargarDispositivos();
+            alert(`Dispositivo ${modoEdicionDispositivo ? 'actualizado' : 'creado'} correctamente`);
+            limpiarFormularioDispositivo(); // Limpia y resetea el modo
+            buscarDispositivos(); // Refrescar la tabla con la última búsqueda
         } catch (error) {
             console.error("Error:", error);
             alert("Error al guardar dispositivo: " + error.message);
         }
     }
 
-    // Agregar el event listener para el formulario
-    document.getElementById('dispositivo-form').addEventListener('submit', manejarDispositivo);
-
+    function limpiarFormularioDispositivo() {
+        const form = document.getElementById('dispositivo-form');
+        form.reset();
+        modoEdicionDispositivo = false;
+        dispositivoEditando = null;
+        form.querySelector('button[type="submit"]').textContent = 'Guardar Dispositivo';
+    }
 
 
     // ==================== FUNCIONES PARA ALERTAS ====================
+    let alertas = []; // Declarar globalmente para que todas las funciones la compartan
+
     async function cargarTodasLasAlertas() {
         try {
             const response = await fetch("http://localhost:8082/api/alertas");
             if (!response.ok) throw new Error("Error al cargar alertas");
 
-            alertas = await response.json(); // Actualizado para usar la variable global
+            alertas = await response.json();
             renderizarAlertas(alertas);
         } catch (error) {
             console.error("Error:", error);
@@ -814,6 +994,11 @@
         const tbody = document.getElementById('alertas-body');
         tbody.innerHTML = '';
 
+        if (listaAlertas.length === 0) {
+            tbody.innerHTML = '<tr><td colspan="8" style="text-align: center;">No se encontraron alertas.</td></tr>';
+            return;
+        }
+
         listaAlertas.forEach(alerta => {
             const tr = document.createElement('tr');
             tr.innerHTML = `
@@ -832,26 +1017,29 @@
             tbody.appendChild(tr);
         });
 
-        // Agregar eventos a los botones (Agregado)
-        document.querySelectorAll('.btn-edit').forEach(btn => {
+        document.querySelectorAll('#alertas-body .btn-edit').forEach(btn => { // Especificar el tbody
             btn.addEventListener('click', () => editarAlerta(btn.dataset.id));
         });
 
-        document.querySelectorAll('.btn-delete').forEach(btn => {
+        document.querySelectorAll('#alertas-body .btn-delete').forEach(btn => { // Especificar el tbody
             btn.addEventListener('click', () => eliminarAlerta(btn.dataset.id));
         });
     }
 
     async function editarAlerta(id) {
         const alerta = alertas.find(a => a.id == id);
-        if (!alerta) return;
+        if (!alerta) {
+            alert('Alerta no encontrada en la lista actual. Intente recargar los datos.');
+            return;
+        }
 
         const form = document.getElementById('alerta-form');
-        form.idDispositivo.value = alerta.idDispositivo || '';
-        form.tipoAlerta.value = alerta.tipoAlerta || '';
+        // Asegúrate de que los 'name' de tus inputs en el HTML coincidan con los nombres en el objeto 'alerta'
+        form.dispositivo.value = alerta.idDispositivo || ''; // Tu HTML tiene 'dispositivo' para el input
+        form.tipo.value = alerta.tipoAlerta || '';          // Tu HTML tiene 'tipo' para el input
         form.descripcion.value = alerta.descripcion || '';
-        form.nivelSeveridad.value = alerta.nivelSeveridad || '';
-        form.estado.value = alerta.estado || '';
+        form.severidad.value = alerta.nivelSeveridad || ''; // Tu HTML tiene 'severidad' para el input
+        // form.estado.value = alerta.estado || ''; // No hay campo 'estado' en tu formulario HTML para alertas
 
         modoEdicionAlerta = true;
         alertaEditando = alerta;
@@ -883,8 +1071,17 @@
         const form = e.target;
         const data = Object.fromEntries(new FormData(form));
 
+        // Renombrar campos para que coincidan con tu backend de Alerta (si es necesario)
+        const payload = {
+            idDispositivo: data.dispositivo,
+            tipoAlerta: data.tipo,
+            descripcion: data.descripcion,
+            nivelSeveridad: data.severidad
+            // Otros campos como fechaHora, estado, etc., podrían ser manejados por el backend
+        };
 
-        if (!data.idDispositivo.match(/^[0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{12}$/)) {
+
+        if (!payload.idDispositivo.match(/^[0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{12}$/)) {
             alert("El ID del dispositivo debe ser un UUID válido (ej: xxxxxxxx-xxxx-xxxx-xxxx-xxxxxxxxxxxx)");
             return;
         }
@@ -900,7 +1097,7 @@
             response = await fetch(url, {
                 method,
                 headers: { "Content-Type": "application/json" },
-                body: JSON.stringify(data)
+                body: JSON.stringify(payload) // Usar el payload transformado
             });
 
             if (!response.ok) {
@@ -909,33 +1106,40 @@
             }
 
             alert(`Alerta ${modoEdicionAlerta ? 'actualizada' : 'creada'} correctamente`);
-            form.reset();
-            modoEdicionAlerta = false;
-            alertaEditando = null;
-            form.querySelector('button[type="submit"]').textContent = 'Guardar Alerta';
-            cargarTodasLasAlertas();
+            limpiarFormularioAlerta();
+            cargarTodasLasAlertas(); // Recargar todas las alertas después de guardar
         } catch (error) {
             console.error("Error:", error);
             alert("Error al guardar alerta: " + error.message);
         }
     }
 
+    function limpiarFormularioAlerta() {
+        const form = document.getElementById('alerta-form');
+        form.reset();
+        modoEdicionAlerta = false;
+        alertaEditando = null;
+        form.querySelector('button[type="submit"]').textContent = 'Guardar Alerta';
+    }
+
+
     function filtrarAlertas() {
-        const severidad = document.getElementById('filtro-severidad').value;
-        const estado = document.getElementById('filtro-estado').value;
+        const severidad = document.getElementById('alert-filter').value; // Tu HTML tiene alert-filter
+        // const estado = document.getElementById('filtro-estado').value; // No hay un filtro de estado en tu HTML
 
         const filas = document.querySelectorAll('#alertas-body tr');
 
         filas.forEach(fila => {
-            const textoSeveridad = fila.cells[4].textContent;
-            const textoEstado = fila.cells[6].textContent;
+            const textoSeveridad = fila.cells[4].textContent; // Columna de Severidad
+            // const textoEstado = fila.cells[6].textContent; // Columna de Estado
 
-            const coincideSeveridad = !severidad || textoSeveridad === severidad;
-            const coincideEstado = !estado || textoEstado === estado;
+            const coincideSeveridad = (severidad === 'all' || textoSeveridad === severidad);
+            // const coincideEstado = (!estado || textoEstado === estado);
 
-            fila.style.display = (coincideSeveridad && coincideEstado) ? '' : 'none';
+            fila.style.display = (coincideSeveridad) ? '' : 'none'; // Solo filtrar por severidad
         });
     }
+
 
     // ==================== FUNCIONES DE SESIÓN ====================
 
