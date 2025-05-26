@@ -984,7 +984,7 @@
             dispositivos = await response.json();
 
             const select = document.getElementById("select-dispositivo");
-            if (!select) return; // evita error si no está en el DOM aún
+            if (!select) return;
 
             select.innerHTML = '<option value="">Seleccione un dispositivo</option>';
 
