@@ -65,11 +65,18 @@
                         <div class="form-row">
                             <div class="form-group">
                                 <label>Dispositivo:</label>
-                                <input type="text" name="dispositivo" class="form-control" required>
+                                <select name="dispositivo" id="select-dispositivo" class="form-control" required>
+                                    <option value="">Seleccione un dispositivo</option>
+                                </select>
                             </div>
                             <div class="form-group">
                                 <label>Tipo:</label>
-                                <input type="text" name="tipo" class="form-control" required>
+                                <select name="tipo" class="form-control" required>
+                                    <option value="">Seleccione tipo</option>
+                                    <option value="Emergencia">Emergencia</option>
+                                    <option value="Advertencia">Advertencia</option>
+                                    <option value="Mantenimiento">Mantenimiento</option>
+                                </select>
                             </div>
                             <div class="form-group">
                                 <label>Severidad:</label>
@@ -120,7 +127,8 @@
                 </div>
             </div>
 
-        <!----MAPA Y DISPOSITIVOS----->
+
+            <!----MAPA Y DISPOSITIVOS----->
             <div class="content" id="mapa">
                 <h2>Gestión de Dispositivos</h2>
                 <div class="form-container">
@@ -370,6 +378,9 @@
 
                     //if (contentId === 'clientes') cargarClientes();
                     //if (contentId === 'empleados') cargarEmpleados();
+                    if (contentId === 'alertas') activarVistaAlertas();
+
+
                 }
             });
         });
@@ -822,8 +833,9 @@
 
     async function cargarTodasLasAlertas() {
         try {
-            const response = await fetch("http://localhost:8082/api/alertas");
+            const response = await fetch("http://localhost:8862/api/alertas");
             if (!response.ok) throw new Error("Error al cargar alertas");
+
             alertas = await response.json();
             renderizarAlertas(alertas);
         } catch (error) {
@@ -832,10 +844,12 @@
         }
     }
 
+
     async function cargarAlertasDispositivo(dispositivoId) {
         try {
-            const response = await fetch(`http://localhost:8082/api/alertas/dispositivo/${dispositivoId}`);
+            const response = await fetch(`http://localhost:8862/api/alertas/dispositivo/${dispositivoId}`);
             if (!response.ok) throw new Error("Error al cargar alertas del dispositivo");
+
             alertas = await response.json();
             renderizarAlertas(alertas);
         } catch (error) {
@@ -844,37 +858,28 @@
         }
     }
 
+
     function renderizarAlertas(lista) {
         const tbody = document.getElementById('alertas-body');
         tbody.innerHTML = '';
 
         lista.forEach(alerta => {
+            const dispositivo = dispositivos.find(d => d.id === alerta.idDispositivo);
+            const nombreDispositivo = dispositivo ? dispositivo.nombre : alerta.idDispositivo;
+
             const tr = document.createElement('tr');
             tr.innerHTML = `
-                <td>${alerta.id || ''}</td>
-                <td>${alerta.idDispositivo || ''}</td>
+                <td>${nombreDispositivo}</td>
                 <td>${alerta.tipoAlerta || ''}</td>
                 <td>${alerta.descripcion || ''}</td>
                 <td>${alerta.nivelSeveridad || ''}</td>
                 <td>${alerta.fechaHora ? new Date(alerta.fechaHora).toLocaleString() : ''}</td>
-                <td>${alerta.estado || ''}</td>
-                <td class="actions">
-                    <button class="btn-edit" data-id="${alerta.id}">Editar</button>
-                    <button class="btn-delete" data-id="${alerta.id}">Eliminar</button>
-                </td>
             `;
             tbody.appendChild(tr);
         });
-
-        document.querySelectorAll('.btn-edit').forEach(btn => {
-            btn.addEventListener('click', () => editarAlerta(btn.dataset.id));
-        });
-
-        document.querySelectorAll('.btn-delete').forEach(btn => {
-            btn.addEventListener('click', () => eliminarAlerta(btn.dataset.id));
-        });
     }
 
+    // Editar alerta (rellena formulario)
     async function editarAlerta(id) {
         const alerta = alertas.find(a => a.id == id);
         if (!alerta) return;
@@ -890,11 +895,12 @@
         form.querySelector('button[type="submit"]').textContent = 'Actualizar Alerta';
     }
 
+    // Eliminar alerta
     async function eliminarAlerta(id) {
         if (!confirm('¿Está seguro de eliminar esta alerta?')) return;
 
         try {
-            const response = await fetch(`http://localhost:8082/api/alertas/${id}`, {
+            const response = await fetch(`http://localhost:8862/api/alertas/${id}`, {
                 method: "DELETE"
             });
             if (!response.ok) throw new Error("Error al eliminar alerta");
@@ -907,27 +913,33 @@
         }
     }
 
+
     async function manejarAlerta(e) {
         e.preventDefault();
         const form = e.target;
         const data = Object.fromEntries(new FormData(form));
 
-        if (!data.dispositivo.match(/^[0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{12}$/)) {
-            alert("El ID del dispositivo debe ser un UUID válido (ej: xxxxxxxx-xxxx-xxxx-xxxx-xxxxxxxxxxxx)");
+        if (!data.dispositivo.match(/^[0-9a-fA-F-]{36}$/)) {
+            alert("Seleccione un dispositivo válido");
             return;
         }
 
         try {
             const url = modoEdicionAlerta
-                ? `http://localhost:8082/api/alertas/${alertaEditando.id}`
-                : "http://localhost:8082/api/alertas";
+                ? `http://localhost:8862/api/alertas/${alertaEditando.id}`
+                : "http://localhost:8862/api/alertas";
 
             const method = modoEdicionAlerta ? "PUT" : "POST";
 
             const response = await fetch(url, {
                 method,
                 headers: { "Content-Type": "application/json" },
-                body: JSON.stringify(data)
+                body: JSON.stringify({
+                    idDispositivo: data.dispositivo,
+                    tipoAlerta: data.tipo,
+                    descripcion: data.descripcion,
+                    nivelSeveridad: data.severidad
+                })
             });
 
             if (!response.ok) {
@@ -945,19 +957,57 @@
             console.error("Error:", error);
             alert("Error al guardar alerta: " + error.message);
         }
+
     }
+    document.addEventListener("DOMContentLoaded", () => {
+        document.getElementById('alerta-form').addEventListener('submit', manejarAlerta);
+    });
+
+
 
     function filtrarAlertas() {
-        const severidad = document.getElementById('alert-filter').value;
+        const severidad = document.getElementById('alert-filter').value.toLowerCase();
         const filas = document.querySelectorAll('#alertas-body tr');
 
         filas.forEach(fila => {
             const textoSeveridad = fila.cells[3].textContent.toLowerCase();
-            const filtro = severidad.toLowerCase();
-            const coincide = filtro === 'all' || textoSeveridad.includes(filtro);
+            const coincide = severidad === 'all' || textoSeveridad.includes(severidad);
             fila.style.display = coincide ? '' : 'none';
         });
     }
+
+    async function cargarDispositivosEnFormulario() {
+        try {
+            const response = await fetch("http://localhost:8081/api/dispositivos");
+            if (!response.ok) throw new Error("Error al cargar dispositivos");
+
+            dispositivos = await response.json();
+
+            const select = document.getElementById("select-dispositivo");
+            if (!select) return; // evita error si no está en el DOM aún
+
+            select.innerHTML = '<option value="">Seleccione un dispositivo</option>';
+
+            dispositivos.forEach(dispositivo => {
+                const option = document.createElement('option');
+                option.value = dispositivo.id;
+                option.textContent = dispositivo.nombre || dispositivo.id;
+                select.appendChild(option);
+            });
+        } catch (error) {
+            console.error("Error:", error);
+            alert("No se pudieron cargar los dispositivos");
+        }
+    }
+
+
+
+    async function activarVistaAlertas() {
+        await cargarDispositivosEnFormulario();
+        await cargarTodasLasAlertas();
+    }
+
+
 
 
 // ==================== FUNCIONES DE SESIÓN ====================
