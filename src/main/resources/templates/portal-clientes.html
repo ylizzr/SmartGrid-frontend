@@ -3,8 +3,69 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Portal de Clientes</title>
-    <link rel="stylesheet" href="css/portales.css">
+    <title>Portal de Clientes - Energía Inteligente</title>
+    <link rel="stylesheet" href="/css/portal-cliente.css">
+    <style>
+        /* Estilos básicos para las alertas y la tabla, puedes mover esto a tu portales.css */
+        .alert {
+            padding: 15px;
+            margin-bottom: 20px;
+            border: 1px solid transparent;
+            border-radius: 4px;
+        }
+        .alert-warning {
+            color: #8a6d3b;
+            background-color: #fcf8e3;
+            border-color: #faebcc;
+        }
+        .alert-danger {
+            color: #a94442;
+            background-color: #f2dede;
+            border-color: #ebccd1;
+        }
+        .accounts-table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-top: 20px;
+        }
+        .accounts-table th, .accounts-table td {
+            border: 1px solid #ddd;
+            padding: 8px;
+            text-align: left;
+        }
+        .accounts-table th {
+            background-color: #f2f2f2;
+        }
+
+        /* Estilos para el menú (si no están en portales.css) */
+        .menu ul {
+            list-style: none;
+            padding: 0;
+            margin: 0;
+        }
+        .menu ul li {
+            padding: 10px 15px;
+            cursor: pointer;
+            border-bottom: 1px solid #eee;
+        }
+        .menu ul li:hover {
+            background-color: #f5f5f5;
+        }
+        .menu ul li.active {
+            background-color: #007bff;
+            color: white;
+            font-weight: bold;
+        }
+        .content-area {
+            flex-grow: 1; /* Permite que ocupe el espacio restante */
+            padding-left: 20px;
+        }
+        .container {
+            display: flex; /* Para el layout del menú y contenido */
+            justify-content: space-between;
+            align-items: flex-start; /* Alinea arriba el contenido y el menú */
+        }
+    </style>
 </head>
 <body>
 <header>
@@ -12,14 +73,15 @@
         <div class="logo">
             <img src="/img/logo.png" alt="Energía Inteligente">
         </div>
-        <button>CERRAR SESIÓN</button>
+        <form action="/logout" method="post">
+            <button type="submit">CERRAR SESIÓN</button>
+        </form>
     </div>
 </header>
 
 <section class="welcome-section">
     <div class="container">
-        <h2>Bienvenido(a) a Energía Inteligente</h2>
-        <p>(nombre cliente)</p>
+        <h2 id="welcome-message">Cargando información...</h2>
     </div>
 </section>
 
@@ -27,31 +89,29 @@
     <div class="container">
         <div class="menu">
             <ul>
-                <li class="active">Menu</li>
-                <li>Reporte incidencias</li>
-                <li>Facturas y pagos</li>
-                <li>Notificaciones</li>
+                <li class="active" data-content-id="info-general">Información General</li>
+                <li data-content-id="reporte-incidencias">Reporte de Incidencias</li>
+                <li data-content-id="facturas-pagos">Facturas y Pagos</li>
+                <li data-content-id="notificaciones">Notificaciones</li>
             </ul>
         </div>
         <div class="content-area">
-            <div class="empty-message">Seleccione una opción del menú</div>
+            <div class="main-content" id="info-general">
+            </div>
 
-            <!-- Contenido para Reporte incidencias -->
-            <div class="content" id="reporte-incidencias">
+            <div class="content" id="reporte-incidencias" style="display: none;">
                 <h2>Reporte de Incidencias</h2>
-                <p>Contenido del reporte de incidencias...</p>
+                <p>Aquí puedes reportar cualquier problema o incidencia relacionada con tu servicio de Energía Inteligente. Por favor, describe la situación detalladamente.</p>
             </div>
 
-            <!-- Contenido para Facturas y pagos -->
-            <div class="content" id="facturas-pagos">
+            <div class="content" id="facturas-pagos" style="display: none;">
                 <h2>Facturas y Pagos</h2>
-                <p>Contenido de facturas y pagos...</p>
+                <p>Consulta tus facturas pendientes, revisa tu historial de pagos y gestiona tus opciones de pago.</p>
             </div>
 
-            <!-- Contenido para Notificaciones -->
-            <div class="content" id="notificaciones">
+            <div class="content" id="notificaciones" style="display: none;">
                 <h2>Notificaciones</h2>
-                <p>Contenido de notificaciones...</p>
+                <p>Mantente al día con las últimas noticias, avisos importantes sobre tu servicio y promociones exclusivas.</p>
             </div>
         </div>
     </div>
@@ -64,32 +124,109 @@
 </footer>
 
 <script>
-    document.addEventListener('DOMContentLoaded', function() {
+    document.addEventListener("DOMContentLoaded", async () => {
+        const welcomeMessageElement = document.getElementById('welcome-message');
+        const mainContentElement = document.getElementById('info-general');
+
+    try {
+        const response = await fetch('http://localhost:8080/api/clientes/cuentas-asociadas', {
+            credentials: 'include'
+        });
+
+        if (!response.ok) {
+            throw new Error(`Error del servidor: ${response.status} ${response.statusText}`);
+        }
+
+        const data = await response.json();
+
+        if (data.message) {
+            welcomeMessageElement.textContent = `Bienvenido(a) a Energía Inteligente`;
+            mainContentElement.innerHTML = `
+                <div class="alert alert-warning">
+                    <h3>¡Hola!</h3>
+                    <p>${data.message}</p>
+                    <p>Para acceder a todos los servicios, por favor contacta a nuestro equipo de soporte para asociar tu correo a una cuenta existente o crear una nueva.</p>
+                </div>
+            `;
+        } else {
+            renderizarInformacionCuentas(data);
+        }
+
+    } catch (error) {
+        console.error("Error al cargar la información del portal:", error);
+        welcomeMessageElement.textContent = `Error al cargar la información`;
+        mainContentElement.innerHTML = `
+            <div class="alert alert-danger">
+                <p>No pudimos cargar tu información en este momento. Por favor, intenta de nuevo más tarde o contacta a soporte.</p>
+                <p>Detalle del error: ${error.message}</p>
+            </div>
+        `;
+    }
+
+        // --- Menu
         const menuItems = document.querySelectorAll('.menu ul li');
-        const contents = document.querySelectorAll('.content');
-        const emptyMessage = document.querySelector('.empty-message');
+        const contentAreas = document.querySelectorAll('.content-area .content');
 
         menuItems.forEach(item => {
-            item.addEventListener('click', function() {
-                // Remover clase active de todos los items
+            item.addEventListener('click', () => {
                 menuItems.forEach(i => i.classList.remove('active'));
-                // Añadir clase active al item seleccionado
-                this.classList.add('active');
+                item.classList.add('active');
 
-                // Ocultar todos los contenidos
-                contents.forEach(c => c.classList.remove('active'));
+                const targetContentId = item.dataset.contentId;
 
-                // Mostrar mensaje vacío o contenido correspondiente
-                if(this.textContent === 'Menu') {
-                    emptyMessage.style.display = 'block';
-                } else {
-                    emptyMessage.style.display = 'none';
-                    const contentId = this.textContent.toLowerCase().replace(/\s+/g, '-');
-                    document.getElementById(contentId).classList.add('active');
-                }
+                contentAreas.forEach(content => {
+                    if (content.id === targetContentId) {
+                        content.style.display = 'block';
+                    } else {
+                        content.style.display = 'none';
+                    }
+                });
             });
         });
     });
+
+    function renderizarInformacionCuentas(cuentas) {
+        const welcomeMessageElement = document.getElementById('welcome-message');
+        const mainContentElement = document.getElementById('info-general');
+        const correo = cuentas[0]?.correo || "Usuario";
+
+        welcomeMessageElement.textContent = `Bienvenido(a), ${correo}`;
+
+        let html = `
+            <div class="accounts-container">
+                <h3>Tus cuentas asociadas:</h3>
+                <table class="accounts-table">
+                    <thead>
+                        <tr>
+                            <th>Nombre</th>
+                            <th>Número de Cuenta</th>
+                            <th>Celular</th>
+                            <th>Dirección</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+        `;
+
+        cuentas.forEach(cuenta => {
+            html += `
+                <tr>
+                    <td>${cuenta.nombre || 'No especificado'}</td>
+                    <td>${cuenta.numeroCuenta || 'No especificado'}</td>
+                    <td>${cuenta.celular || 'No especificado'}</td>
+                    <td>${cuenta.direccion || 'No especificado'}</td>
+                </tr>
+            `;
+        });
+
+        html += `
+                    </tbody>
+                </table>
+            </div>
+            <p>Selecciona una opción del menú de la izquierda para gestionar tus servicios.</p>
+        `;
+        mainContentElement.innerHTML = html;
+    }
 </script>
+
 </body>
 </html>
