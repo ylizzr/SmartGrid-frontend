@@ -440,7 +440,7 @@
     // ==================== CLIENTES ====================
     async function cargarClientes() {
         try {
-            const response = await fetch("http://localhost:8080/api/admin/clientes");
+            const response = await fetch("http://energiainteligente.ddns.net:8080/api/admin/clientes");
             if (!response.ok) throw new Error("Error al cargar clientes");
             const data = await response.json();
             clientes = data;
@@ -455,7 +455,7 @@
         if (!filtro) return alert("Ingresa un valor para buscar");
 
         try {
-            const response = await fetch(`http://localhost:8080/api/admin/clientes/buscar?filtro=${encodeURIComponent(filtro)}`);
+            const response = await fetch(`http://energiainteligente.ddns.net:8080/api/admin/clientes/buscar?filtro=${encodeURIComponent(filtro)}`);
             if (!response.ok) throw new Error("Error al buscar clientes");
 
             const resultados = await response.json();
@@ -522,7 +522,7 @@
     async function eliminarCliente(id) {
         if (!confirm('¿Está seguro de eliminar este cliente?')) return;
         try {
-            const response = await fetch(`http://localhost:8080/api/admin/clientes/${id}`, {
+            const response = await fetch(`http://energiainteligente.ddns.net:8080/api/admin/clientes/${id}`, {
                 method: "DELETE"
             });
             if (!response.ok) throw new Error("Error al eliminar cliente");
@@ -543,8 +543,8 @@
 
         try {
             const url = modoEdicionCliente
-                ? `http://localhost:8080/api/admin/clientes/${clienteEditando.id}`
-                : "http://localhost:8080/api/admin/clientes";
+                ? `http://energiainteligente.ddns.net:8080/api/admin/clientes/${clienteEditando.id}`
+                : "http://energiainteligente.ddns.net:8080/api/admin/clientes";
             const method = modoEdicionCliente ? "PUT" : "POST";
 
             const response = await fetch(url, {
@@ -570,7 +570,7 @@
     // ==================== EMPLEADOS ====================
     async function cargarEmpleados() {
         try {
-            const response = await fetch("http://localhost:8080/api/admin/empleados");
+            const response = await fetch("http://energiainteligente.ddns.net:8080/api/admin/empleados");
             if (!response.ok) throw new Error("Error al cargar empleados");
             empleados = await response.json();
             renderizarEmpleados(empleados);
@@ -584,7 +584,7 @@
         if (!filtro) return alert("Ingresa un valor para buscar");
 
         try {
-            const response = await fetch(`http://localhost:8080/api/admin/empleados/buscar?filtro=${encodeURIComponent(filtro)}`);
+            const response = await fetch(`http://energiainteligente.ddns.net:8080/api/admin/empleados/buscar?filtro=${encodeURIComponent(filtro)}`);
             if (!response.ok) throw new Error("Error al buscar empleados");
 
             const resultados = await response.json();
@@ -650,7 +650,7 @@
         if (!confirm('¿Está seguro de eliminar este empleado?')) return;
 
         try {
-            const response = await fetch(`http://localhost:8080/api/admin/empleados/${cedula}`, {
+            const response = await fetch(`http://energiainteligente.ddns.net:8080/api/admin/empleados/${cedula}`, {
                 method: "DELETE"
             });
             if (!response.ok) throw new Error("Error al eliminar empleado");
@@ -670,8 +670,8 @@
 
         try {
             const url = modoEdicionEmpleado
-                ? `http://localhost:8080/api/admin/empleados/${empleadoEditando.cedula}`
-                : "http://localhost:8080/api/admin/empleados";
+                ? `http://energiainteligente.ddns.net:8080/api/admin/empleados/${empleadoEditando.cedula}`
+                : "http://lenergiainteligente.ddns.net:8080/api/admin/empleados";
             const method = modoEdicionEmpleado ? "PUT" : "POST";
 
             const response = await fetch(url, {
@@ -1060,7 +1060,7 @@
     // ===================== CARGAR CLIENTES =====================
     async function cargarClientesEnSelect() {
         try {
-            const response = await fetch("http://localhost:8080/api/admin/clientes");
+            const response = await fetch("http://energiainteligente.ddns.net:8080/api/admin/clientes");
             if (!response.ok) throw new Error("No se pudieron cargar los clientes");
             const clientes = await response.json();
 
