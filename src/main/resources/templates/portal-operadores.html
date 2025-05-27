@@ -1133,7 +1133,7 @@
         const data = Object.fromEntries(new FormData(form));
 
         try {
-            const response = await fetch("http://localhostenergiainteligente.ddns.net:8088/api/facturacion", {
+            const response = await fetch("http://energiainteligente.ddns.net:8088/api/facturacion", {
                 method: "POST",
                 headers: { "Content-Type": "application/json" },
                 body: JSON.stringify(data)
