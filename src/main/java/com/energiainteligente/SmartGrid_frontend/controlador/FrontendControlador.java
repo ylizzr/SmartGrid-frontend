@@ -26,8 +26,13 @@ public class FrontendControlador {
 
     @GetMapping("/pago")
     public String mostrarFormularioPago() {
-        return "pago-form"; // crea un archivo pago-form.html en /templates
+        return "pago-form";
     }
+    @GetMapping("/mapa")
+    public String mapa() {
+        return "mapa";
+    }
+
 
     @PostMapping("/pago")
     public String procesarPago(@RequestParam("cuenta") String cuenta, Model model) {

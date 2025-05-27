@@ -1,0 +1,391 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Mapa de Dispositivos</title>
+    <link rel="stylesheet" href="css/portal-operador.css">
+    <!-- Google Maps JS API -->
+    <script async
+            src="https://maps.googleapis.com/maps/api/js?key=AIzaSyCvK0uSxahBem49TUFh29F4jptADT0I6GI&callback=initMap&libraries=places&v=weekly">
+    </script>
+    <style>
+        #map {
+          height: calc(100vh - 60px);
+          width: 100%;
+        }
+
+        #map-actions {
+          position: absolute;
+          top: 70px;
+          right: 20px;
+          z-index: 1000;
+          display: flex;
+          flex-direction: column;
+          gap: 10px;
+        }
+
+        .map-btn {
+          padding: 10px;
+          background: white;
+          border: 1px solid #ddd;
+          border-radius: 4px;
+          cursor: pointer;
+          box-shadow: 0 2px 4px rgba(0,0,0,0.2);
+        }
+
+        .map-btn:hover {
+          background: #f5f5f5;
+        }
+
+        .map-btn.primary {
+          background: #007bff;
+          color: white;
+          border-color: #006fe6;
+        }
+
+        .map-btn.danger {
+          background: #dc3545;
+          color: white;
+          border-color: #c82333;
+        }
+
+        .info-window {
+          min-width: 200px;
+        }
+
+        .info-window h3 {
+          margin-top: 0;
+          color: #333;
+        }
+
+        .info-window p {
+          margin: 5px 0;
+        }
+    </style>
+</head>
+<body>
+<header>
+    <div class="container">
+        <div class="logo">
+            <img src="/img/logo.png" alt="Energía Inteligente">
+        </div>
+        <button onclick="volverAGestion()" class="btn btn-primary">
+            Volver a Gestión
+        </button>
+    </div>
+</header>
+
+<div id="map"></div>
+<div id="map-actions">
+    <button class="map-btn primary" onclick="seleccionarUbicacion()">
+        Seleccionar Ubicación
+    </button>
+    <button class="map-btn danger" onclick="cancelarSeleccion()" id="btn-cancelar-mapa" style="display:none;">
+        Cancelar Selección
+    </button>
+</div>
+
+<script>
+    let map;
+    let markers = [];
+    let selectingLocation = false;
+    let selectedMarker = null;
+    let infoWindow = null;
+
+    // Inicialización del mapa
+    function initMap() {
+        map = new google.maps.Map(document.getElementById("map"), {
+            center: { lat: 4.6097, lng: -74.0817 },
+            zoom: 13,
+        });
+
+        infoWindow = new google.maps.InfoWindow();
+
+        // Cargar dispositivos existentes
+        cargarDispositivos();
+
+        // Verificar si hay datos del formulario
+        const formData = sessionStorage.getItem('formularioDispositivo');
+        if (formData) {
+            const data = JSON.parse(formData);
+            if (data.coordenadas) {
+                const [lat, lng] = data.coordenadas.split(',').map(Number);
+                map.setCenter({ lat, lng });
+                map.setZoom(15);
+
+                // Crear marcador temporal
+                selectedMarker = new google.maps.Marker({
+                    position: { lat, lng },
+                    map: map,
+                    draggable: true,
+                    icon: {
+                        path: google.maps.SymbolPath.CIRCLE,
+                        scale: 10,
+                        fillColor: "#4285F4",
+                        fillOpacity: 1,
+                        strokeWeight: 2,
+                        strokeColor: "white"
+                    }
+                });
+
+                // Mostrar botón de cancelar
+                document.getElementById('btn-cancelar-mapa').style.display = 'block';
+            }
+        }
+    }
+
+    // Función para cargar dispositivos en el mapa
+    async function cargarDispositivos() {
+        try {
+            const response = await fetch("http://energiainteligente.ddns.net:8081/api/dispositivos");
+            if (!response.ok) throw new Error("Error al cargar dispositivos");
+
+            const dispositivos = await response.json();
+
+            // Limpiar marcadores anteriores
+            markers.forEach(marker => marker.setMap(null));
+            markers = [];
+
+            // Agregar nuevos marcadores
+            dispositivos.forEach(dispositivo => {
+                const [lat, lng] = dispositivo.coordenadas.split(',').map(Number);
+
+                const marker = new google.maps.Marker({
+                    position: { lat, lng },
+                    map: map,
+                    title: dispositivo.nombre,
+                    icon: getMarkerIcon(dispositivo.estado)
+                });
+
+                // InfoWindow para el marcador
+                marker.addListener("click", () => {
+                    infoWindow.setContent(`
+                        <div class="info-window">
+                            <h3>${dispositivo.nombre}</h3>
+                            <p><strong>Tipo:</strong> ${dispositivo.tipo}</p>
+                            <p><strong>Ubicación:</strong> ${dispositivo.ubicacion}</p>
+                            <p><strong>Estado:</strong> ${dispositivo.estado}</p>
+                        </div>
+                    `);
+                    infoWindow.open(map, marker);
+                });
+
+                markers.push(marker);
+            });
+        } catch (error) {
+            console.error("Error:", error);
+            alert("Error al cargar dispositivos en el mapa");
+        }
+    }
+
+    // Función para seleccionar una ubicación
+    function seleccionarUbicacion() {
+        selectingLocation = true;
+        document.getElementById('btn-cancelar-mapa').style.display = 'block';
+
+        // Cambiar el cursor del mapa
+        map.setOptions({ draggableCursor: 'crosshair' });
+
+        // Escuchar clics en el mapa
+        const clickListener = map.addListener('click', (event) => {
+            if (selectingLocation) {
+                // Eliminar marcador anterior si existe
+                if (selectedMarker) {
+                    selectedMarker.setMap(null);
+                }
+
+                // Crear nuevo marcador
+                selectedMarker = new google.maps.Marker({
+                    position: event.latLng,
+                    map: map,
+                    draggable: true,
+                    icon: {
+                        path: google.maps.SymbolPath.CIRCLE,
+                        scale: 10,
+                        fillColor: "#4285F4",
+                        fillOpacity: 1,
+                        strokeWeight: 2,
+                        strokeColor: "white"
+                    }
+                });
+
+                // Permitir arrastrar el marcador
+                selectedMarker.addListener('dragend', function(event) {
+                    actualizarCoordenadasEnFormulario(event.latLng);
+                });
+
+                // Actualizar formulario con las coordenadas
+                actualizarCoordenadasEnFormulario(event.latLng);
+
+                // Centrar el mapa en la ubicación seleccionada
+                map.panTo(event.latLng);
+            }
+        });
+    }
+
+    // Función para cancelar la selección de ubicación
+    function cancelarSeleccion() {
+        selectingLocation = false;
+        document.getElementById('btn-cancelar-mapa').style.display = 'none';
+        map.setOptions({ draggableCursor: '' });
+
+        if (selectedMarker) {
+            selectedMarker.setMap(null);
+            selectedMarker = null;
+        }
+    }
+
+    // Función para actualizar el formulario con las coordenadas seleccionadas
+    function actualizarCoordenadasEnFormulario(latLng) {
+        const formData = sessionStorage.getItem('formularioDispositivo');
+        if (formData) {
+            const data = JSON.parse(formData);
+            data.coordenadas = `${latLng.lat().toFixed(6)},${latLng.lng().toFixed(6)}`;
+            sessionStorage.setItem('formularioDispositivo', JSON.stringify(data));
+        }
+    }
+
+    // Función para volver a la página de gestión
+    function volverAGestion() {
+        window.location.href = "dispositivos.html";
+    }
+
+    // Función para obtener el icono según el estado del dispositivo
+    function getMarkerIcon(estado) {
+        let color;
+
+        switch(estado) {
+            case 'Activo':
+                color = '#4CAF50'; // Verde
+                break;
+            case 'Inactivo':
+                color = '#F44336'; // Rojo
+                break;
+            case 'Mantenimiento':
+                color = '#FFC107'; // Amarillo
+                break;
+            default:
+                color = '#9E9E9E'; // Gris
+        }
+
+        return {
+            path: google.maps.SymbolPath.CIRCLE,
+            fillColor: color,
+            fillOpacity: 1,
+            strokeWeight: 1,
+            strokeColor: '#ffffff',
+            scale: 8
+        };
+    }
+
+    // Función para obtener la dirección a partir de coordenadas
+async function geocodeLatLng(latLng) {
+    try {
+        const geocoder = new google.maps.Geocoder();
+        const response = await new Promise((resolve, reject) => {
+            geocoder.geocode({ location: latLng }, (results, status) => {
+                if (status === "OK") {
+                    resolve(results);
+                } else {
+                    reject(status);
+                }
+            });
+        });
+
+        if (response[0]) {
+            return response[0].formatted_address;
+        } else {
+            return "Ubicación seleccionada";
+        }
+    } catch (error) {
+        console.error("Error en geocodificación:", error);
+        return "Ubicación seleccionada";
+    }
+}
+
+// Modifica la función seleccionarUbicacion para incluir geocodificación
+async function seleccionarUbicacion() {
+    selectingLocation = true;
+    document.getElementById('btn-cancelar-mapa').style.display = 'block';
+    map.setOptions({ draggableCursor: 'crosshair' });
+
+    const clickListener = map.addListener('click', async (event) => {
+        if (selectingLocation) {
+            if (selectedMarker) {
+                selectedMarker.setMap(null);
+            }
+
+            selectedMarker = new google.maps.Marker({
+                position: event.latLng,
+                map: map,
+                draggable: true,
+                icon: {
+                    path: google.maps.SymbolPath.CIRCLE,
+                    scale: 10,
+                    fillColor: "#4285F4",
+                    fillOpacity: 1,
+                    strokeWeight: 2,
+                    strokeColor: "white"
+                }
+            });
+
+            // Obtener dirección
+            const direccion = await geocodeLatLng(event.latLng);
+            const coordenadas = `${event.latLng.lat().toFixed(6)},${event.latLng.lng().toFixed(6)}`;
+
+            // Mostrar información en el mapa
+            infoWindow.setContent(`
+                <div class="info-window">
+                    <h3>Nueva Ubicación</h3>
+                    <p><strong>Dirección:</strong> ${direccion}</p>
+                    <p><strong>Coordenadas:</strong> ${coordenadas}</p>
+                </div>
+            `);
+            infoWindow.open(map, selectedMarker);
+
+            // Actualizar formulario padre
+            if (window.opener) {
+                window.opener.postMessage({
+                    type: 'ubicacionSeleccionada',
+                    direccion: direccion,
+                    coordenadas: coordenadas
+                }, '*');
+            }
+
+            // Permitir arrastrar y actualizar
+            selectedMarker.addListener('dragend', async function(event) {
+                const newDireccion = await geocodeLatLng(event.latLng);
+                const newCoordenadas = `${event.latLng.lat().toFixed(6)},${event.latLng.lng().toFixed(6)}`;
+
+                infoWindow.setContent(`
+                    <div class="info-window">
+                        <h3>Nueva Ubicación</h3>
+                        <p><strong>Dirección:</strong> ${newDireccion}</p>
+                        <p><strong>Coordenadas:</strong> ${newCoordenadas}</p>
+                    </div>
+                `);
+
+                if (window.opener) {
+                    window.opener.postMessage({
+                        type: 'ubicacionSeleccionada',
+                        direccion: newDireccion,
+                        coordenadas: newCoordenadas
+                    }, '*');
+                }
+            });
+
+            map.panTo(event.latLng);
+        }
+    });
+}
+
+// Modifica la función volverAGestion
+function volverAGestion() {
+    if (window.opener) {
+        window.close();
+    } else {
+        window.location.href = "portal-operadores.html#mapa";
+    }
+}
+</script>
+</body>
+</html>

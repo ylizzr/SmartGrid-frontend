@@ -3,23 +3,64 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Portal de Clientes</title>
-    <link rel="stylesheet" href="css/portales.css">
+    <title>Portal de Clientes - Energía Inteligente</title>
+    <link rel="stylesheet" href="/css/portal-cliente.css">
+
+    <style>
+        .btn {
+            padding: 6px 12px;
+            border: none;
+            border-radius: 5px;
+            font-size: 0.85em;
+            font-weight: bold;
+            cursor: pointer;
+            transition: 0.2s;
+        }
+
+        .btn-primary {
+            background-color: #065B4E;
+            color: white;
+        }
+
+        .btn-primary:hover {
+            background-color: #04453a;
+        }
+
+        .alert {
+            padding: 15px;
+            margin: 20px 0;
+            border-radius: 6px;
+        }
+
+        .alert-warning {
+            background-color: #fff3cd;
+            border-left: 4px solid #ffc107;
+            color: #856404;
+        }
+
+        .alert-danger {
+            background-color: #f8d7da;
+            border-left: 4px solid #dc3545;
+            color: #721c24;
+        }
+    </style>
 </head>
+
 <body>
 <header>
     <div class="container">
         <div class="logo">
             <img src="/img/logo.png" alt="Energía Inteligente">
         </div>
-        <button>CERRAR SESIÓN</button>
+        <form action="/logout" method="post">
+            <button type="submit">CERRAR SESIÓN</button>
+        </form>
     </div>
 </header>
 
 <section class="welcome-section">
     <div class="container">
-        <h2>Bienvenido(a) a Energía Inteligente</h2>
-        <p>(nombre cliente)</p>
+        <h2 id="welcome-message">Cargando información...</h2>
     </div>
 </section>
 
@@ -27,31 +68,40 @@
     <div class="container">
         <div class="menu">
             <ul>
-                <li class="active">Menu</li>
-                <li>Reporte incidencias</li>
-                <li>Facturas y pagos</li>
-                <li>Notificaciones</li>
+                <li class="active" data-content-id="info-general">Información General</li>
+                <li data-content-id="reporte-incidencias">Reporte de Incidencias</li>
+                <li data-content-id="facturas-pagos">Facturas y Pagos</li>
             </ul>
         </div>
         <div class="content-area">
-            <div class="empty-message">Seleccione una opción del menú</div>
+            <!-- Información general -->
+            <div class="content" id="info-general">
+                <!-- Aquí se inyecta la info con JS -->
+            </div>
 
-            <!-- Contenido para Reporte incidencias -->
-            <div class="content" id="reporte-incidencias">
+            <!-- Incidencias -->
+            <div class="content" id="reporte-incidencias" style="display: none;">
                 <h2>Reporte de Incidencias</h2>
-                <p>Contenido del reporte de incidencias...</p>
+                <p>Aquí puedes reportar cualquier problema o incidencia relacionada con tu servicio de Energía Inteligente.</p>
             </div>
 
-            <!-- Contenido para Facturas y pagos -->
-            <div class="content" id="facturas-pagos">
-                <h2>Facturas y Pagos</h2>
-                <p>Contenido de facturas y pagos...</p>
-            </div>
-
-            <!-- Contenido para Notificaciones -->
-            <div class="content" id="notificaciones">
-                <h2>Notificaciones</h2>
-                <p>Contenido de notificaciones...</p>
+            <!-- Facturas -->
+            <div class="content" id="facturas-pagos" style="display: none;">
+                <div class="table-container" id="contenedor-facturas">
+                    <h3>Mis Facturas</h3>
+                    <table class="data-table" id="tabla-facturas-cliente">
+                        <thead>
+                        <tr>
+                            <th>Periodo</th>
+                            <th>Consumo</th>
+                            <th>Costo</th>
+                            <th>Estado</th>
+                            <th>Pago</th>
+                        </tr>
+                        </thead>
+                        <tbody></tbody>
+                    </table>
+                </div>
             </div>
         </div>
     </div>
@@ -64,32 +114,178 @@
 </footer>
 
 <script>
-    document.addEventListener('DOMContentLoaded', function() {
-        const menuItems = document.querySelectorAll('.menu ul li');
-        const contents = document.querySelectorAll('.content');
-        const emptyMessage = document.querySelector('.empty-message');
+    // ────────────────────────────
+    //  VARIABLE GLOBAL DEL CORREO
+    // ────────────────────────────
+    let correoCliente = "";
+
+    document.addEventListener("DOMContentLoaded", async () => {
+        const welcomeMessageElement = document.getElementById('welcome-message');
+        const mainContentElement   = document.getElementById('info-general');
+
+        try {
+            // 1) INFO DE CUENTAS ASOCIADAS
+            const response = await fetch(
+                "http://energiainteligente.ddns.net:8080/api/clientes/cuentas-asociadas",
+                { credentials: "include" }
+            );
+            if (!response.ok) {
+                throw new Error(`Error del servidor: ${response.status} ${response.statusText}`);
+            }
+
+            const data = await response.json();
+
+            // 2) SIN CUENTAS
+            if (data.message) {
+                welcomeMessageElement.textContent = "Bienvenido(a) a Energía Inteligente";
+                mainContentElement.innerHTML = `
+                    <div class="alert alert-warning">
+                        <h3>¡Hola!</h3>
+                        <p>${data.message}</p>
+                        <p>Por favor contacta a nuestro equipo de soporte para asociar tu correo a una cuenta.</p>
+                    </div>`;
+            } else {
+                // 3) CON CUENTAS  → renderiza y guarda correo
+                renderizarInformacionCuentas(data);
+            }
+
+        } catch (error) {
+            console.error("Error al cargar la información del portal:", error);
+            welcomeMessageElement.textContent = "Error al cargar la información";
+            mainContentElement.innerHTML = `
+                <div class="alert alert-danger">
+                    <p>No pudimos cargar tu información en este momento. Intenta más tarde o contacta a soporte.</p>
+                    <p>Detalle del error: ${error.message}</p>
+                </div>`;
+        }
+
+        // Navegación del menú
+        const menuItems    = document.querySelectorAll('.menu ul li');
+        const contentAreas = document.querySelectorAll('.content-area .content');
 
         menuItems.forEach(item => {
-            item.addEventListener('click', function() {
-                // Remover clase active de todos los items
+            item.addEventListener('click', () => {
                 menuItems.forEach(i => i.classList.remove('active'));
-                // Añadir clase active al item seleccionado
-                this.classList.add('active');
+                item.classList.add('active');
 
-                // Ocultar todos los contenidos
-                contents.forEach(c => c.classList.remove('active'));
-
-                // Mostrar mensaje vacío o contenido correspondiente
-                if(this.textContent === 'Menu') {
-                    emptyMessage.style.display = 'block';
-                } else {
-                    emptyMessage.style.display = 'none';
-                    const contentId = this.textContent.toLowerCase().replace(/\s+/g, '-');
-                    document.getElementById(contentId).classList.add('active');
-                }
+                const targetId = item.dataset.contentId;
+                contentAreas.forEach(content => {
+                    content.style.display = (content.id === targetId) ? 'block' : 'none';
+                });
             });
         });
+
+        // 4) Cargar facturas al inicio (cuando ya se tenga correo)
+        cargarFacturasCliente();
     });
+
+    // ────────────────────────────
+    //  INFO DE CUENTAS
+    // ────────────────────────────
+    function renderizarInformacionCuentas(cuentas) {
+        const welcomeMessageElement = document.getElementById('welcome-message');
+        const mainContentElement    = document.getElementById('info-general');
+
+        // Guarda correo global
+        correoCliente = cuentas[0]?.correo || "";
+        welcomeMessageElement.textContent = `Bienvenido(a), ${correoCliente || "Usuario"}`;
+
+        let html = `
+            <div class="accounts-container">
+                <h3>Tus cuentas asociadas:</h3>
+                <table class="accounts-table">
+                    <thead>
+                        <tr>
+                            <th>Nombre</th>
+                            <th>Número de Cuenta</th>
+                            <th>Celular</th>
+                            <th>Dirección</th>
+                        </tr>
+                    </thead>
+                    <tbody>`;
+
+        cuentas.forEach(c => {
+            html += `
+                <tr>
+                    <td>${c.nombre        || "No especificado"}</td>
+                    <td>${c.numeroCuenta  || "No especificado"}</td>
+                    <td>${c.celular       || "No especificado"}</td>
+                    <td>${c.direccion     || "No especificado"}</td>
+                </tr>`;
+        });
+
+        html += `   </tbody>
+                </table>
+            </div>
+            <p>Selecciona una opción del menú para gestionar tus servicios.</p>`;
+
+        mainContentElement.innerHTML = html;
+    }
+
+    // ────────────────────────────
+    //  FACTURAS
+    // ────────────────────────────
+    async function cargarFacturasCliente() {
+        if (!correoCliente) {
+            // Si todavía no se estableció, espera 300 ms y re-intenta (máx 3 veces)
+            setTimeout(cargarFacturasCliente, 300);
+            return;
+        }
+
+        try {
+            const response = await fetch(
+                `http://energiainteligente.ddns.net:8088/api/facturacion/mis-facturas?correo=${encodeURIComponent(correoCliente)}`
+            );
+            if (!response.ok) throw new Error("No se pudieron cargar las facturas");
+
+            const facturas = await response.json();
+            renderizarFacturasCliente(facturas);
+        } catch (error) {
+            console.error("Error:", error);
+            alert("Error al cargar tus facturas");
+        }
+    }
+
+    function renderizarFacturasCliente(facturas) {
+        const tbody = document.querySelector('#tabla-facturas-cliente tbody');
+        tbody.innerHTML = '';
+
+        facturas.forEach(f => {
+            const fila = document.createElement('tr');
+            fila.innerHTML = `
+                <td>${f.periodoFacturado}</td>
+                <td>${f.consumoTotal} kWh</td>
+                <td>$${f.costoTotal}</td>
+                <td>${f.estadoPago}</td>
+                <td>
+                    ${f.estadoPago === "pendiente"
+                        ? `<button class="btn btn-primary btn-pagar" data-id="${f.id}">Pagar</button>`
+                        : `<span style="color:green">Pagado</span>`
+                    }
+                </td>`;
+            tbody.appendChild(fila);
+        });
+
+        // Botones de pago
+        document.querySelectorAll('.btn-pagar').forEach(btn =>
+            btn.addEventListener('click', () => pagarFactura(btn.dataset.id))
+        );
+    }
+
+    async function pagarFactura(idFactura) {
+        if (!confirm("¿Confirmas el pago de esta factura?")) return;
+        try {
+            const resp = await fetch(`http://energiainteligente.ddns.net:8088/api/facturacion/pagar/${idFactura}`, { method: "PUT" });
+            if (!resp.ok) throw new Error("No se pudo procesar el pago");
+            alert("¡Factura pagada exitosamente!");
+            cargarFacturasCliente();
+        } catch (error) {
+            console.error("Error:", error);
+            alert("Error al pagar factura");
+        }
+    }
 </script>
+
+
 </body>
 </html>
