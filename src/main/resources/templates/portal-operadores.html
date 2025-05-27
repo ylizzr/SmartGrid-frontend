@@ -671,7 +671,7 @@
         try {
             const url = modoEdicionEmpleado
                 ? `http://energiainteligente.ddns.net:8080/api/admin/empleados/${empleadoEditando.cedula}`
-                : "http://lenergiainteligente.ddns.net:8080/api/admin/empleados";
+                : "http://energiainteligente.ddns.net:8080/api/admin/empleados";
             const method = modoEdicionEmpleado ? "PUT" : "POST";
 
             const response = await fetch(url, {
