@@ -126,7 +126,7 @@
         try {
             // 1) INFO DE CUENTAS ASOCIADAS
             const response = await fetch(
-                "http://energiainteligente.ddns.net/api/clientes/cuentas-asociadas",
+                "https://energiainteligente.ddns.net/api/clientes/cuentas-asociadas",
                 { credentials: "include" }
             );
             if (!response.ok) {
@@ -234,7 +234,7 @@
 
         try {
             const response = await fetch(
-                `http://energiainteligente.ddns.net/api/facturacion/mis-facturas?correo=${encodeURIComponent(correoCliente)}`
+                `https://energiainteligente.ddns.net/api/facturacion/mis-facturas?correo=${correoCliente}`
             );
             if (!response.ok) throw new Error("No se pudieron cargar las facturas");
 
@@ -275,7 +275,7 @@
     async function pagarFactura(idFactura) {
         if (!confirm("¿Confirmas el pago de esta factura?")) return;
         try {
-            const resp = await fetch(`http://energiainteligente.ddns.net/api/facturacion/pagar/${idFactura}`, { method: "PUT" });
+            const resp = await fetch(`https://energiainteligente.ddns.net/api/facturacion/pagar/${idFactura}`, { method: "PUT" })`, { method: "PUT" });
             if (!resp.ok) throw new Error("No se pudo procesar el pago");
             alert("¡Factura pagada exitosamente!");
             cargarFacturasCliente();
