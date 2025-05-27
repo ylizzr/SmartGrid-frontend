@@ -128,7 +128,7 @@ function validarLoginOperador() {
     const clave = document.getElementById("operadorPassword").value;
     const error = document.getElementById("errorOperador");
 
-    fetch("http://localhost:8080/api/empleado/login",
+    fetch("http://34.28.160.157:8080/login/oauth2/code/google",
      {
         method: "POST",
         headers: {
