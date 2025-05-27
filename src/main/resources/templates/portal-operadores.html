@@ -733,7 +733,7 @@
 
     async function buscarDispositivos(termino = '') {
         try {
-            let url = "http://localhost:8081/api/dispositivos";
+            let url = "http://energiainteligente.ddns.net:8081/api/dispositivos";
             if (termino.trim()) {
                 url += `?search=${encodeURIComponent(termino.trim())}`;
             }
@@ -792,7 +792,7 @@
 
     async function editarDispositivo(id) {
         try {
-            const response = await fetch(`http://localhost:8081/api/dispositivos/${id}`);
+            const response = await fetch(`http://energiainteligente.ddns.net:8081/api/dispositivos/${id}`);
             if (!response.ok) throw new Error("Error al cargar dispositivo");
 
             const dispositivo = await response.json();
@@ -830,8 +830,8 @@
 
         try {
             const url = form.dataset.editando
-                ? `http://localhost:8081/api/dispositivos/${form.dataset.editando}`
-                : "http://localhost:8081/api/dispositivos";
+                ? `http://energiainteligente.ddns.net:8081/api/dispositivos/${form.dataset.editando}`
+                : "http://energiainteligente.ddns.net:8081/api/dispositivos";
 
             const method = form.dataset.editando ? "PUT" : "POST";
 
@@ -874,7 +874,7 @@
 
     async function cargarTodasLasAlertas() {
         try {
-            const response = await fetch("http://localhost:8862/api/alertas");
+            const response = await fetch("http://energiainteligente.ddns.net:8862/api/alertas");
             if (!response.ok) throw new Error("Error al cargar alertas");
 
             alertas = await response.json();
@@ -888,7 +888,7 @@
 
     async function cargarAlertasDispositivo(dispositivoId) {
         try {
-            const response = await fetch(`http://localhost:8862/api/alertas/dispositivo/${dispositivoId}`);
+            const response = await fetch(`http://energiainteligente.ddns.net:8862/api/alertas/dispositivo/${dispositivoId}`);
             if (!response.ok) throw new Error("Error al cargar alertas del dispositivo");
 
             alertas = await response.json();
@@ -941,7 +941,7 @@
         if (!confirm('¿Está seguro de eliminar esta alerta?')) return;
 
         try {
-            const response = await fetch(`http://localhost:8862/api/alertas/${id}`, {
+            const response = await fetch(`http://energiainteligente.ddns.net:8862/api/alertas/${id}`, {
                 method: "DELETE"
             });
             if (!response.ok) throw new Error("Error al eliminar alerta");
@@ -967,8 +967,8 @@
 
         try {
             const url = modoEdicionAlerta
-                ? `http://localhost:8862/api/alertas/${alertaEditando.id}`
-                : "http://localhost:8862/api/alertas";
+                ? `http://energiainteligente.ddns.net:8862/api/alertas/${alertaEditando.id}`
+                : "http://energiainteligente.ddns.net:8862/api/alertas";
 
             const method = modoEdicionAlerta ? "PUT" : "POST";
 
@@ -1019,7 +1019,7 @@
 
     async function cargarDispositivosEnFormulario() {
         try {
-            const response = await fetch("http://localhost:8081/api/dispositivos");
+            const response = await fetch("http://energiainteligente.ddns.net:8081/api/dispositivos");
             if (!response.ok) throw new Error("Error al cargar dispositivos");
 
             dispositivos = await response.json();
@@ -1090,7 +1090,7 @@
     // ===================== CARGAR FACTURAS =====================
     async function cargarFacturas() {
         try {
-            const response = await fetch("http://localhost:8088/api/facturacion");
+            const response = await fetch("http://energiainteligente.ddns.net:8088/api/facturacion");
             if (!response.ok) throw new Error("Error al cargar facturas");
             const facturas = await response.json();
             renderizarFacturas(facturas);
@@ -1133,7 +1133,7 @@
         const data = Object.fromEntries(new FormData(form));
 
         try {
-            const response = await fetch("http://localhost:8088/api/facturacion", {
+            const response = await fetch("http://localhostenergiainteligente.ddns.net:8088/api/facturacion", {
                 method: "POST",
                 headers: { "Content-Type": "application/json" },
                 body: JSON.stringify(data)
@@ -1154,7 +1154,7 @@
     async function eliminarFactura(id) {
         if (!confirm("¿Deseas eliminar esta factura?")) return;
         try {
-            const response = await fetch(`http://localhost:8088/api/facturacion/${id}`, {
+            const response = await fetch(`http://energiainteligente.ddns.net:8088/api/facturacion/${id}`, {
                 method: "DELETE",
                 credentials: "include"
             });
