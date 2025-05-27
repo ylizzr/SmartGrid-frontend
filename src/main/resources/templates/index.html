@@ -31,7 +31,7 @@
                 <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Cerrar"></button>
             </div>
             <div class="modal-body modal-body-custom text-center">
-                <a href="http://energiainteligente.ddns.net:8080/oauth2/authorization/google">
+                <a href="http://energiainteligente.ddns.net/oauth2/authorization/google">
                     <button class="btn btn-success mt-3 btn-sm">Iniciar sesión con Google</button>
                 </a>
             </div>
@@ -128,7 +128,7 @@ function validarLoginOperador() {
     const clave = document.getElementById("operadorPassword").value;
     const error = document.getElementById("errorOperador");
 
-    fetch("http://energiainteligente.ddns.net:8080/api/empleado/login", {
+    fetch("http://energiainteligente.ddns.net/api/empleado/login", {
         method: "POST",
         headers: {
             "Content-Type": "application/x-www-form-urlencoded"

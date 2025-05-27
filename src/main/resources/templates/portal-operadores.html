@@ -440,7 +440,7 @@
     // ==================== CLIENTES ====================
     async function cargarClientes() {
         try {
-            const response = await fetch("http://energiainteligente.ddns.net:8080/api/admin/clientes");
+            const response = await fetch("http://energiainteligente.ddns.net/api/admin/clientes");
             if (!response.ok) throw new Error("Error al cargar clientes");
             const data = await response.json();
             clientes = data;
@@ -455,7 +455,7 @@
         if (!filtro) return alert("Ingresa un valor para buscar");
 
         try {
-            const response = await fetch(`http://energiainteligente.ddns.net:8080/api/admin/clientes/buscar?filtro=${encodeURIComponent(filtro)}`);
+            const response = await fetch(`http://energiainteligente.ddns.net/api/admin/clientes/buscar?filtro=${encodeURIComponent(filtro)}`);
             if (!response.ok) throw new Error("Error al buscar clientes");
 
             const resultados = await response.json();
@@ -522,7 +522,7 @@
     async function eliminarCliente(id) {
         if (!confirm('¿Está seguro de eliminar este cliente?')) return;
         try {
-            const response = await fetch(`http://energiainteligente.ddns.net:8080/api/admin/clientes/${id}`, {
+            const response = await fetch(`http://energiainteligente.ddns.net/api/admin/clientes/${id}`, {
                 method: "DELETE"
             });
             if (!response.ok) throw new Error("Error al eliminar cliente");
@@ -543,8 +543,8 @@
 
         try {
             const url = modoEdicionCliente
-                ? `http://energiainteligente.ddns.net:8080/api/admin/clientes/${clienteEditando.id}`
-                : "http://energiainteligente.ddns.net:8080/api/admin/clientes";
+                ? `http://energiainteligente.ddns.net/api/admin/clientes/${clienteEditando.id}`
+                : "http://energiainteligente.ddns.net/api/admin/clientes";
             const method = modoEdicionCliente ? "PUT" : "POST";
 
             const response = await fetch(url, {
@@ -570,7 +570,7 @@
     // ==================== EMPLEADOS ====================
     async function cargarEmpleados() {
         try {
-            const response = await fetch("http://energiainteligente.ddns.net:8080/api/admin/empleados");
+            const response = await fetch("http://energiainteligente.ddns.net/api/admin/empleados");
             if (!response.ok) throw new Error("Error al cargar empleados");
             empleados = await response.json();
             renderizarEmpleados(empleados);
@@ -584,7 +584,7 @@
         if (!filtro) return alert("Ingresa un valor para buscar");
 
         try {
-            const response = await fetch(`http://energiainteligente.ddns.net:8080/api/admin/empleados/buscar?filtro=${encodeURIComponent(filtro)}`);
+            const response = await fetch(`http://energiainteligente.ddns.net/api/admin/empleados/buscar?filtro=${encodeURIComponent(filtro)}`);
             if (!response.ok) throw new Error("Error al buscar empleados");
 
             const resultados = await response.json();
@@ -650,7 +650,7 @@
         if (!confirm('¿Está seguro de eliminar este empleado?')) return;
 
         try {
-            const response = await fetch(`http://energiainteligente.ddns.net:8080/api/admin/empleados/${cedula}`, {
+            const response = await fetch(`http://energiainteligente.ddns.net/api/admin/empleados/${cedula}`, {
                 method: "DELETE"
             });
             if (!response.ok) throw new Error("Error al eliminar empleado");
@@ -670,8 +670,8 @@
 
         try {
             const url = modoEdicionEmpleado
-                ? `http://energiainteligente.ddns.net:8080/api/admin/empleados/${empleadoEditando.cedula}`
-                : "http://energiainteligente.ddns.net:8080/api/admin/empleados";
+                ? `http://energiainteligente.ddns.net/api/admin/empleados/${empleadoEditando.cedula}`
+                : "http://energiainteligente.ddns.net/api/admin/empleados";
             const method = modoEdicionEmpleado ? "PUT" : "POST";
 
             const response = await fetch(url, {
@@ -733,7 +733,7 @@
 
     async function buscarDispositivos(termino = '') {
         try {
-            let url = "http://energiainteligente.ddns.net:8081/api/dispositivos";
+            let url = "http://energiainteligente.ddns.net/api/dispositivos";
             if (termino.trim()) {
                 url += `?search=${encodeURIComponent(termino.trim())}`;
             }
@@ -792,7 +792,7 @@
 
     async function editarDispositivo(id) {
         try {
-            const response = await fetch(`http://energiainteligente.ddns.net:8081/api/dispositivos/${id}`);
+            const response = await fetch(`http://energiainteligente.ddns.net/api/dispositivos/${id}`);
             if (!response.ok) throw new Error("Error al cargar dispositivo");
 
             const dispositivo = await response.json();
@@ -830,8 +830,8 @@
 
         try {
             const url = form.dataset.editando
-                ? `http://energiainteligente.ddns.net:8081/api/dispositivos/${form.dataset.editando}`
-                : "http://energiainteligente.ddns.net:8081/api/dispositivos";
+                ? `http://energiainteligente.ddns.net/api/dispositivos/${form.dataset.editando}`
+                : "http://energiainteligente.ddns.net/api/dispositivos";
 
             const method = form.dataset.editando ? "PUT" : "POST";
 
@@ -874,7 +874,7 @@
 
     async function cargarTodasLasAlertas() {
         try {
-            const response = await fetch("http://energiainteligente.ddns.net:8862/api/alertas");
+            const response = await fetch("http://energiainteligente.ddns.net/api/alertas");
             if (!response.ok) throw new Error("Error al cargar alertas");
 
             alertas = await response.json();
@@ -888,7 +888,7 @@
 
     async function cargarAlertasDispositivo(dispositivoId) {
         try {
-            const response = await fetch(`http://energiainteligente.ddns.net:8862/api/alertas/dispositivo/${dispositivoId}`);
+            const response = await fetch(`http://energiainteligente.ddns.net/api/alertas/dispositivo/${dispositivoId}`);
             if (!response.ok) throw new Error("Error al cargar alertas del dispositivo");
 
             alertas = await response.json();
@@ -941,7 +941,7 @@
         if (!confirm('¿Está seguro de eliminar esta alerta?')) return;
 
         try {
-            const response = await fetch(`http://energiainteligente.ddns.net:8862/api/alertas/${id}`, {
+            const response = await fetch(`http://energiainteligente.ddns.net/api/alertas/${id}`, {
                 method: "DELETE"
             });
             if (!response.ok) throw new Error("Error al eliminar alerta");
@@ -967,8 +967,8 @@
 
         try {
             const url = modoEdicionAlerta
-                ? `http://energiainteligente.ddns.net:8862/api/alertas/${alertaEditando.id}`
-                : "http://energiainteligente.ddns.net:8862/api/alertas";
+                ? `http://energiainteligente.ddns.net/api/alertas/${alertaEditando.id}`
+                : "http://energiainteligente.ddns.net/api/alertas";
 
             const method = modoEdicionAlerta ? "PUT" : "POST";
 
@@ -1019,7 +1019,7 @@
 
     async function cargarDispositivosEnFormulario() {
         try {
-            const response = await fetch("http://energiainteligente.ddns.net:8081/api/dispositivos");
+            const response = await fetch("http://energiainteligente.ddns.net/api/dispositivos");
             if (!response.ok) throw new Error("Error al cargar dispositivos");
 
             dispositivos = await response.json();
@@ -1060,7 +1060,7 @@
     // ===================== CARGAR CLIENTES =====================
     async function cargarClientesEnSelect() {
         try {
-            const response = await fetch("http://energiainteligente.ddns.net:8080/api/admin/clientes");
+            const response = await fetch("http://energiainteligente.ddns.net/api/admin/clientes");
             if (!response.ok) throw new Error("No se pudieron cargar los clientes");
             const clientes = await response.json();
 
@@ -1090,7 +1090,7 @@
     // ===================== CARGAR FACTURAS =====================
     async function cargarFacturas() {
         try {
-            const response = await fetch("http://energiainteligente.ddns.net:8088/api/facturacion");
+            const response = await fetch("http://energiainteligente.ddns.net/api/facturacion");
             if (!response.ok) throw new Error("Error al cargar facturas");
             const facturas = await response.json();
             renderizarFacturas(facturas);
@@ -1133,7 +1133,7 @@
         const data = Object.fromEntries(new FormData(form));
 
         try {
-            const response = await fetch("http://energiainteligente.ddns.net:8088/api/facturacion", {
+            const response = await fetch("http://energiainteligente.ddns.net/api/facturacion", {
                 method: "POST",
                 headers: { "Content-Type": "application/json" },
                 body: JSON.stringify(data)
@@ -1154,7 +1154,7 @@
     async function eliminarFactura(id) {
         if (!confirm("¿Deseas eliminar esta factura?")) return;
         try {
-            const response = await fetch(`http://energiainteligente.ddns.net:8088/api/facturacion/${id}`, {
+            const response = await fetch(`http://energiainteligente.ddns.net/api/facturacion/${id}`, {
                 method: "DELETE",
                 credentials: "include"
             });

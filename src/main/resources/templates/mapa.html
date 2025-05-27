@@ -136,7 +136,7 @@
     // Función para cargar dispositivos en el mapa
     async function cargarDispositivos() {
         try {
-            const response = await fetch("http://energiainteligente.ddns.net:8081/api/dispositivos");
+            const response = await fetch("http://energiainteligente.ddns.net/api/dispositivos");
             if (!response.ok) throw new Error("Error al cargar dispositivos");
 
             const dispositivos = await response.json();
